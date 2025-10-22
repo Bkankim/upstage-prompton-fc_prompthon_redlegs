@@ -10,8 +10,9 @@
 - `code/experiments/result_analyzer.py` - 실험 결과 분석기 (생성 예정)
 - `code/experiments/optimizer.py` - 최적 템플릿 선택기 (생성 예정)
 - `code/experiments/submission_generator.py` - 최종 제출 파일 생성기 (생성 예정)
-- `logs/` - 실험 로그 저장 디렉토리 (생성 예정)
-- `submissions/` - 제출 파일 저장 디렉토리 (생성 예정)
+- `code/logs/baseline_results.json` - 베이스라인 성능 문서 (Recall 32.24%)
+- `code/submission_baseline.csv` - 베이스라인 교정 결과 (254개 샘플)
+- `code/analysis_baseline.csv` - 베이스라인 상세 분석 (TP/FP/FM/FR)
 
 ### Notes
 
@@ -25,14 +26,14 @@
 
 ## Tasks
 
-- [ ] 1.0 베이스라인 성능 측정 및 분석
-  - [ ] 1.1 환경 설정 및 의존성 설치 확인 (uv sync)
-  - [ ] 1.2 API 키 설정 확인 (.env 파일)
-  - [ ] 1.3 데이터 파일 배치 확인 (code/data/train_dataset.csv)
-  - [ ] 1.4 베이스라인 프롬프트로 교정 실행 (baseline_generate.py)
-  - [ ] 1.5 베이스라인 Recall 점수 측정 (evaluate.py)
-  - [ ] 1.6 오류 유형별 분석 결과 검토 (analysis.csv)
-  - [ ] 1.7 베이스라인 성능 문서화 (logs/baseline_results.json)
+- [x] 1.0 베이스라인 성능 측정 및 분석
+  - [x] 1.1 환경 설정 및 의존성 설치 확인 (uv sync)
+  - [x] 1.2 API 키 설정 확인 (.env 파일)
+  - [x] 1.3 데이터 파일 배치 확인 (code/data/train_dataset.csv)
+  - [x] 1.4 베이스라인 프롬프트로 교정 실행 (baseline_generate.py)
+  - [x] 1.5 베이스라인 Recall 점수 측정 (evaluate.py)
+  - [x] 1.6 오류 유형별 분석 결과 검토 (analysis.csv)
+  - [x] 1.7 베이스라인 성능 문서화 (logs/baseline_results.json)
 
 - [ ] 2.0 프롬프트 개선 전략 실험
   - [ ] 2.1 Few-shot 예시 추가 버전 작성 (prompts_v2_fewshot.py)

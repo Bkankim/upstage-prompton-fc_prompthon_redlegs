@@ -1,0 +1,50 @@
+# 데이터 및 대용량 아티팩트 제외
+/data/
+/logs/
+/models/
+/submission/
+/tests/
+/ai-dev-tasks-main/
+/docs/session_handover.md
+AGENTS.md
+CLAUDE.md
+
+# 가상환경, OS별 파일 등 일반적인 제외 항목 (필요 시 추가)
+# Python
+*.pyc
+__pycache__/
+.DS_Store
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Environment
+.env
+.venv/
+venv/
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Output files
+submission.csv
+analysis.csv
+*.csv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# uv
+.uv/
+uv.lock

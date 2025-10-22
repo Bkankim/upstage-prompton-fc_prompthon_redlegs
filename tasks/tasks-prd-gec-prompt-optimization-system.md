@@ -13,6 +13,11 @@
 - `code/logs/baseline_results.json` - 베이스라인 성능 문서 (Recall 32.24%)
 - `code/submission_baseline.csv` - 베이스라인 교정 결과 (254개 샘플)
 - `code/analysis_baseline.csv` - 베이스라인 상세 분석 (TP/FP/FM/FR)
+- `code/fewshot_v2_generate.py` - Few-shot v2 프롬프트 실행 스크립트
+- `code/logs/fewshot_v2_results.json` - Few-shot v2 성능 문서 (Recall 35.92%)
+- `code/submission_fewshot_v2.csv` - Few-shot v2 교정 결과 (254개 샘플)
+- `code/analysis_fewshot_v2.csv` - Few-shot v2 상세 분석
+- `code/logs/comparison_baseline_vs_fewshot_v2.json` - 베이스라인 vs Few-shot v2 비교 분석
 
 ### Notes
 
@@ -36,7 +41,7 @@
   - [x] 1.7 베이스라인 성능 문서화 (logs/baseline_results.json)
 
 - [ ] 2.0 프롬프트 개선 전략 실험
-  - [ ] 2.1 Few-shot 예시 추가 버전 작성 (prompts_v2_fewshot.py)
+  - [x] 2.1 Few-shot 예시 추가 버전 작성 (prompts_v2_fewshot.py)
   - [ ] 2.2 오류 유형 명시 버전 작성 (prompts_v3_errortypes.py)
   - [ ] 2.3 Chain-of-Thought 버전 작성 (prompts_v4_cot.py)
   - [ ] 2.4 Multi-turn 검증 버전 작성 (prompts_v5_multiturn.py)

@@ -15,11 +15,13 @@
 
 ### Notes
 
+- **⚠️ 중요: 모든 Python 실행은 반드시 `uv run python` 명령 사용**
 - 베이스라인 코드는 이미 `/code` 폴더에 준비되어 있음
 - uv를 사용한 의존성 관리 (pyproject.toml)
 - Python 3.12 사용 (.python-version)
 - 실험은 베이스라인 성능 측정부터 시작하여 점진적으로 개선
 - 모든 실험 결과는 JSON 형식으로 로깅
+- 상세 uv 가이드: `/docs/UV_ENVIRONMENT_GUIDE.md`
 
 ## Tasks
 

@@ -10,15 +10,23 @@
 - Upstage Solar Pro 2 모델
 
 ### Requirements
+
+**⚠️ 중요: 모든 Python 실행은 반드시 uv 환경에서!**
+- 상세 가이드: [UV_ENVIRONMENT_GUIDE.md](docs/UV_ENVIRONMENT_GUIDE.md)
+
 ```bash
-# uv 설치
+# 1. uv 설치 (필수!)
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# 의존성 설치
+# 2. 의존성 설치
 cd code && uv sync
 
-# API 키 설정
+# 3. API 키 설정
 echo "UPSTAGE_API_KEY=your_key_here" > .env
+
+# 4. 실행 예시 (반드시 uv run 사용!)
+uv run python baseline_generate.py  # ✅ 올바른 방법
+# python baseline_generate.py       # ❌ 절대 금지!
 ```
 
 ## 1. Competition Info

@@ -46,6 +46,21 @@ baseline_code/:
 
 ---
 
+# 🚨 절대 규칙: UV 환경 필수 사용
+
+**모든 Python 명령은 반드시 `uv run` 사용!**
+```bash
+# ✅ 올바른 실행
+uv run python baseline_generate.py
+
+# ❌ 절대 금지 (시스템 Python)
+python baseline_generate.py
+```
+
+상세 가이드: `/docs/UV_ENVIRONMENT_GUIDE.md`
+
+---
+
 # 🚀 Quick Start
 
 ## 필수 체크리스트

@@ -4,9 +4,13 @@ Rule-Checklist 후처리 모듈
 """
 
 import re
+import logging
 from typing import Optional
 
 from .base import BasePostprocessor
+
+# 로거 설정
+logger = logging.getLogger(__name__)
 
 
 class RuleChecklistPostprocessor(BasePostprocessor):
@@ -49,12 +53,15 @@ class RuleChecklistPostprocessor(BasePostprocessor):
             # 3단계: 공백 및 줄바꿈 정리
             text = self._clean_whitespace(text)
 
+            # 4단계: 길이 가드 적용 (60% 미만 손실 방지)
+            text = self._apply_length_guard(original, text)
+
             # 최종 결과가 비어있으면 원문 반환
             return text.strip() if text.strip() else original
 
         except Exception as e:
             # 예외 발생 시 안전하게 원문 반환
-            print(f"Warning: Postprocessing failed - {e}")
+            logger.warning(f"Postprocessing failed - {e}")
             return original
 
     def _clean_response(self, text: str) -> str:
@@ -198,3 +205,42 @@ class RuleChecklistPostprocessor(BasePostprocessor):
         text = text.strip()
 
         return text
+
+    def _apply_length_guard(
+        self,
+        original: str,
+        corrected: str,
+        threshold: float = 0.6
+    ) -> str:
+        """
+        길이 가드 적용: 과도한 텍스트 손실 방지
+
+        후처리 결과가 원문 대비 60% 미만으로 줄어든 경우 원문 반환.
+        이는 "7:3" → "3" 같은 심각한 손실을 방지합니다.
+
+        Args:
+            original: 원본 텍스트
+            corrected: 후처리된 텍스트
+            threshold: 길이 임계값 (기본 0.6 = 60%)
+
+        Returns:
+            str: 가드 적용된 텍스트 (원문 또는 교정문)
+        """
+        # 원문이 비어있으면 그대로 반환
+        if not original or len(original) == 0:
+            return corrected
+
+        # 길이 비율 계산
+        length_ratio = len(corrected) / len(original)
+
+        # 60% 미만으로 줄어든 경우 원문 반환
+        if length_ratio < threshold:
+            logger.warning(
+                f"Length guard activated: {length_ratio:.1%} "
+                f"({len(original)} → {len(corrected)}). "
+                f"Returning original text."
+            )
+            return original
+
+        # 정상 범위면 교정문 반환
+        return corrected

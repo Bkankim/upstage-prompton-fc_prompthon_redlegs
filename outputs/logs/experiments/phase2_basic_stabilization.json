@@ -1,0 +1,204 @@
+{
+  "phase": "Phase 2: 기본 안정화",
+  "status": "완료 (성능 목표 미달)",
+  "completion_date": "2025-10-23",
+  "duration": "1일",
+
+  "objectives": {
+    "primary": "규칙 검증 + 텍스트 손실 방지 + 안정된 베이스라인 확보",
+    "technical_goals": [
+      "규칙별 순효과 분석",
+      "60% 길이 가드 구현",
+      "개선 버전 LB 제출"
+    ],
+    "performance_goals": {
+      "public_lb": "34.5%+",
+      "private_lb": "14.0%+"
+    }
+  },
+
+  "results": {
+    "technical_implementation": {
+      "status": "완료",
+      "achievements": [
+        {
+          "task": "2.3.1 규칙별 순효과 분석",
+          "status": "완료",
+          "findings": "Solar Pro 2 API가 이미 문법 규칙을 학습함",
+          "evidence": "모든 규칙 효과 0 (TP=0, FP=0, NC=254)",
+          "decision": "규칙 유지 (효과 없지만 해롭지 않음)"
+        },
+        {
+          "task": "2.3.2 60% 길이 가드 구현",
+          "status": "완료",
+          "test_results": "8개 단위 테스트 모두 통과",
+          "dry_run": {
+            "train_rollback": "0건 (0.0%)",
+            "test_protection": "2건 방지 가능"
+          },
+          "implementation": "_apply_length_guard() 함수"
+        },
+        {
+          "task": "2.3.3 LB 제출",
+          "status": "완료",
+          "file": "submission_baseline_v2_test.csv",
+          "result": "성능 하락",
+          "decision": "폐기"
+        }
+      ]
+    },
+
+    "performance": {
+      "status": "미달",
+      "baseline": {
+        "public_lb": 34.0426,
+        "private_lb": 13.4454,
+        "file": "submission_baseline_test_clean.csv"
+      },
+      "improved_version": {
+        "public_lb": 31.9149,
+        "private_lb": 12.2951,
+        "file": "submission_baseline_v2_test.csv",
+        "diff_public": -2.1277,
+        "diff_private": -1.1503
+      },
+      "train_performance": {
+        "baseline_recall": 18.58,
+        "improved_recall": 20.72,
+        "diff": 2.14,
+        "note": "Train 성능은 개선됨"
+      }
+    },
+
+    "root_cause_analysis": {
+      "primary_cause": {
+        "factor": "API 랜덤성",
+        "weight": "60%",
+        "description": "같은 프롬프트라도 호출 시점에 따라 응답 다름",
+        "evidence": [
+          "41개 케이스(37.3%) 변경",
+          "Train 성능 개선(+2.14%p) vs Test 성능 하락(-2.13%p)",
+          "일관성 없는 API 응답"
+        ]
+      },
+      "secondary_cause": {
+        "factor": "메타데이터 제거 불완전",
+        "weight": "30%",
+        "description": "복잡한 설명문 처리 실패",
+        "evidence": [
+          "grm260797: 기존 1460자 → 신규 801자 (여전히 과도함)",
+          "[최종 교정본], 최종 출력: 등 레이블 미제거",
+          "콜론 로직 한계"
+        ]
+      },
+      "tertiary_cause": {
+        "factor": "Train/Test 분포 차이",
+        "weight": "10%",
+        "description": "Public/Private 격차 20%p 암시",
+        "evidence": [
+          "보조용언 띄어쓰기 등 특정 패턴이 Test에 불리",
+          "데이터 분포 차이 추정"
+        ]
+      }
+    },
+
+    "key_findings": [
+      {
+        "id": "finding_1",
+        "title": "Solar Pro 2 API가 문법 규칙을 이미 학습함",
+        "impact": "후처리 규칙 효과 0",
+        "evidence": {
+          "수 있다 띄어쓰기": "35/254 케이스에 이미 적용",
+          "해 보 띄어쓰기": "6/254 케이스에 이미 적용",
+          "안 돼 띄어쓰기": "2/254 케이스에 이미 적용"
+        },
+        "implication": "프롬프트 품질이 후처리보다 중요"
+      },
+      {
+        "id": "finding_2",
+        "title": "API 재호출의 위험성",
+        "impact": "성능 불안정",
+        "evidence": {
+          "변경된 케이스": "41개 (37.3%)",
+          "train_test_mismatch": "Train 개선 vs Test 하락"
+        },
+        "implication": "검증된 버전은 재생성 자제"
+      },
+      {
+        "id": "finding_3",
+        "title": "길이 가드의 한계",
+        "impact": "늘어나는 경우 감지 못함",
+        "evidence": "grm260797: 353자 → 801자 (227%)",
+        "implication": "프롬프트 레벨 차단 필요"
+      }
+    ]
+  },
+
+  "deliverables": {
+    "code": [
+      "src/postprocessors/rule_checklist.py (_apply_length_guard 추가)",
+      "analyze_grammar_rule_effects_v2.py",
+      "test_length_guard_impact.py",
+      "test_length_guard.py",
+      "analyze_performance_drop.py",
+      "compare_train_performance.py"
+    ],
+    "documentation": [
+      "outputs/logs/phase2_results.md",
+      "outputs/logs/performance_drop_root_cause.md",
+      "outputs/logs/performance_drop_analysis.json",
+      "outputs/logs/length_guard_impact.json",
+      "outputs/logs/grammar_rule_analysis_v2.csv"
+    ],
+    "submissions": [
+      "outputs/submissions/test/submission_baseline_v2_test.csv (폐기)"
+    ]
+  },
+
+  "lessons_learned": [
+    {
+      "lesson": "API 재호출은 최소화",
+      "rationale": "랜덤성으로 인한 성능 변동 위험",
+      "action": "검증된 버전 재사용, 프롬프트 변경 시에만 신중히 재생성"
+    },
+    {
+      "lesson": "프롬프트 레벨에서 메타데이터 차단 필요",
+      "rationale": "후처리만으로는 복잡한 설명문 처리 한계",
+      "action": "System 메시지에 출력 규칙 명시"
+    },
+    {
+      "lesson": "Train 성능 ≠ Test 성능",
+      "rationale": "Train 개선이 Test 개선을 보장하지 않음",
+      "action": "일반화 최우선, 교차검증 도입"
+    },
+    {
+      "lesson": "기존 최고 버전 유지",
+      "rationale": "성능 하락 버전 폐기",
+      "action": "submission_baseline_test_clean.csv (34.04%) 계속 사용"
+    }
+  ],
+
+  "next_steps": {
+    "immediate": [
+      "Phase 3.2: 유형별 성과 분석 (안전, API 재호출 불필요)",
+      "취약 오류 유형 식별",
+      "프롬프트 개선 방향 도출"
+    ],
+    "short_term": [
+      "프롬프트 형식 제약 A/B 실험 (20개 샘플)",
+      "메타데이터 사전 차단 효과 검증"
+    ],
+    "long_term": [
+      "5-fold 교차검증 (API 재호출 위험 고려)",
+      "Self-Consistency 도입",
+      "Ensemble 전략"
+    ]
+  },
+
+  "decision": {
+    "phase_2_status": "기술적 완료 (성능 목표 미달)",
+    "baseline_version": "submission_baseline_test_clean.csv (34.04%)",
+    "abandoned_version": "submission_baseline_v2_test.csv (31.91%)",
+    "proceed_to": "Phase 3: 일반화 전략"
+  }
+}

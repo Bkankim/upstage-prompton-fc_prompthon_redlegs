@@ -78,10 +78,20 @@ def register_default_prompts() -> None:
     기본 프롬프트들을 레지스트리에 자동 등록
     """
     from .baseline import BaselinePrompt
+    from .baseline_strict import BaselineStrictPrompt
+    from .baseline_strict_v2 import BaselineStrictV2Prompt
     from .fewshot_v2 import FewshotV2Prompt
+    from .fewshot_v3 import FewShotV3Prompt
+    from .fewshot_v3_enhanced import FewShotV3EnhancedPrompt
+    from .fewshot_v3_improved import FewShotV3ImprovedPrompt
     from .errortypes_v3 import ErrorTypesV3Prompt
 
     registry = get_registry()
     registry.register(BaselinePrompt())
+    registry.register(BaselineStrictPrompt())
+    registry.register(BaselineStrictV2Prompt())
     registry.register(FewshotV2Prompt())
+    registry.register(FewShotV3Prompt())
+    registry.register(FewShotV3EnhancedPrompt())
+    registry.register(FewShotV3ImprovedPrompt())
     registry.register(ErrorTypesV3Prompt())

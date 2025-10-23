@@ -57,6 +57,11 @@ Examples:
         default="solar-pro2",
         help="Model name (default: solar-pro2)"
     )
+    parser.add_argument(
+        "--no-postprocess",
+        action="store_true",
+        help="Disable postprocessing (no rule application, metadata only)"
+    )
 
     args = parser.parse_args()
 
@@ -78,8 +83,11 @@ Examples:
     try:
         generator = SentenceGenerator(
             prompt_name=args.prompt,
-            model=args.model
+            model=args.model,
+            enable_postprocessing=not args.no_postprocess
         )
+
+        print(f"Postprocessing: {'Disabled' if args.no_postprocess else 'Enabled'}")
 
         generator.generate_from_csv(
             input_path=args.input,

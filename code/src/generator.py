@@ -13,6 +13,7 @@ from openai import OpenAI
 
 from src.prompts.registry import get_registry, register_default_prompts
 from src.postprocessors.rule_checklist import RuleChecklistPostprocessor
+from src.postprocessors.enhanced_postprocessor import EnhancedPostprocessor
 
 
 class SentenceGenerator:
@@ -26,7 +27,8 @@ class SentenceGenerator:
         prompt_name: str,
         model: str = "solar-pro2",
         api_key: Optional[str] = None,
-        enable_postprocessing: bool = True
+        enable_postprocessing: bool = True,
+        use_enhanced_postprocessor: bool = False
     ):
         """
         생성기 초기화
@@ -36,6 +38,7 @@ class SentenceGenerator:
             model: 사용할 모델 이름 (기본값: solar-pro2)
             api_key: Upstage API 키 (None인 경우 환경변수에서 로드)
             enable_postprocessing: 후처리 활성화 여부 (기본값: True)
+            use_enhanced_postprocessor: Enhanced 후처리 사용 여부 (기본값: False)
 
         Raises:
             ValueError: API 키가 없거나 프롬프트를 찾을 수 없는 경우
@@ -74,10 +77,14 @@ class SentenceGenerator:
         self.model = model
         self.prompt_name = prompt_name
         self.enable_postprocessing = enable_postprocessing
+        self.use_enhanced_postprocessor = use_enhanced_postprocessor
 
         # 후처리 모듈 초기화
         if enable_postprocessing:
-            self.postprocessor = RuleChecklistPostprocessor()
+            if use_enhanced_postprocessor:
+                self.postprocessor = EnhancedPostprocessor(enable_logging=True)
+            else:
+                self.postprocessor = RuleChecklistPostprocessor()
         else:
             self.postprocessor = None
 

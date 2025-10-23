@@ -18,8 +18,8 @@
 ### ❌ 절대 하지 말아야 할 것
 ```bash
 # 잘못된 실행 방법들 - 사용 금지!
-python baseline_generate.py        # ❌ 시스템 Python 사용
-python3 evaluate.py                # ❌ 시스템 Python 사용
+python scripts/generate.py        # ❌ 시스템 Python 사용
+python3 scripts/evaluate.py       # ❌ 시스템 Python 사용
 pip install pandas                 # ❌ pip 직접 사용
 conda activate myenv              # ❌ 다른 환경 사용
 ```
@@ -27,10 +27,10 @@ conda activate myenv              # ❌ 다른 환경 사용
 ### ✅ 반드시 이렇게 실행
 ```bash
 # 올바른 실행 방법 - uv 사용!
-uv run python baseline_generate.py  # ✅ uv 환경에서 실행
-uv run python evaluate.py           # ✅ uv 환경에서 실행
-uv pip install pandas               # ✅ uv로 패키지 설치
-uv sync                             # ✅ 의존성 동기화
+uv run python scripts/generate.py --prompt baseline  # ✅ uv 환경에서 실행
+uv run python scripts/evaluate.py                    # ✅ uv 환경에서 실행
+uv pip install pandas                                # ✅ uv로 패키지 설치
+uv sync                                              # ✅ 의존성 동기화
 ```
 
 ---
@@ -67,22 +67,21 @@ echo "UPSTAGE_API_KEY=your_actual_api_key_here" > .env
 
 ## 🚀 실행 가이드
 
-### 베이스라인 실행
+### 프롬프트 실험 실행
 ```bash
 # 반드시 code 디렉토리에서
 cd /Competition/upstage-prompton-fc_prompthon_redlegs/code
 
 # 1. 교정 실행 (uv run 필수!)
-uv run python baseline_generate.py
+uv run python scripts/generate.py --prompt baseline
+uv run python scripts/generate.py --prompt fewshot_v2
+uv run python scripts/generate.py --prompt errortypes_v3
 
 # 2. 평가 실행 (uv run 필수!)
-uv run python evaluate.py
-```
+uv run python scripts/evaluate.py --true_df data/train.csv --pred_df submission.csv
 
-### 데이터 분석 실행
-```bash
-# uv run 필수!
-uv run python analyze_dataset.py
+# 3. 전체 실험 워크플로우 (교정 + 평가 + LB 제출 파일 생성)
+uv run python scripts/run_experiment.py --prompt baseline
 ```
 
 ### 새 스크립트 실행

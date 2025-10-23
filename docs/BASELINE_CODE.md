@@ -6,26 +6,38 @@
 
 # 📁 파일 구조
 ```yaml
-baseline_code/:
+code/:
   scripts:
-    baseline_generate.py:
-      purpose: "교정 문장 생성"
+    generate.py:
+      purpose: "교정 문장 생성 (통합 스크립트)"
       input: "data/train_dataset.csv"
-      output: "submission.csv"
-      
+      output: "outputs/submissions/train/*.csv"
+      usage: "--prompt [baseline|fewshot_v2|errortypes_v3]"
+
     evaluate.py:
       purpose: "평가 실행"
       metrics: ["Recall", "Precision"]
-      output: "analysis.csv"
-      
-    metrics.py:
-      purpose: "평가 메트릭 계산"
-      functions: ["calculate_recall", "calculate_precision"]
-      
-    prompts.py:
-      purpose: "프롬프트 템플릿 관리"
-      note: "이 파일을 수정하여 성능 개선"
+      output: "outputs/analysis/*.csv"
+
+    run_experiment.py:
+      purpose: "전체 워크플로우 (교정 + 평가 + LB 제출 파일)"
+
+  src:
+    prompts/:
+      purpose: "프롬프트 템플릿 관리 (모듈화)"
+      files: ["baseline.py", "fewshot_v2.py", "errortypes_v3.py", "registry.py"]
+      note: "새 프롬프트 추가 시 클래스 작성 후 레지스트리 등록"
       priority: "highest"
+
+    metrics/:
+      purpose: "평가 메트릭 계산"
+      files: ["lcs.py", "evaluator.py"]
+
+    generator.py:
+      purpose: "통합 생성기 클래스"
+
+    evaluator.py:
+      purpose: "평가 클래스"
   
   config:
     pyproject.toml:
@@ -51,10 +63,10 @@ baseline_code/:
 **모든 Python 명령은 반드시 `uv run` 사용!**
 ```bash
 # ✅ 올바른 실행
-uv run python baseline_generate.py
+uv run python scripts/generate.py --prompt baseline
 
 # ❌ 절대 금지 (시스템 Python)
-python baseline_generate.py
+python scripts/generate.py
 ```
 
 상세 가이드: `/docs/UV_ENVIRONMENT_GUIDE.md`
@@ -89,11 +101,11 @@ setup_checklist:
     
   step5_generate:
     status: "ready"
-    command: "uv run python baseline_generate.py"
-    
+    command: "uv run python scripts/generate.py --prompt baseline"
+
   step6_evaluate:
     status: "ready"
-    command: "uv run python evaluate.py"
+    command: "uv run python scripts/evaluate.py --true_df data/train.csv --pred_df submission.csv"
 ```
 
 ---

@@ -12,7 +12,7 @@
 ### Requirements
 
 **⚠️ 중요: 모든 Python 실행은 반드시 uv 환경에서!**
-- 상세 가이드: [UV_ENVIRONMENT_GUIDE.md](docs/UV_ENVIRONMENT_GUIDE.md)
+- 상세 가이드: [UV_ENVIRONMENT_GUIDE.md](docs/getting-started/UV_ENVIRONMENT_GUIDE.md)
 
 ```bash
 # 1. uv 설치 (필수!)
@@ -62,16 +62,28 @@ uv run python scripts/generate.py --prompt baseline  # ✅ 올바른 방법
 │   ├── tests/                  # 테스트 (85개)
 │   └── data/                   # 데이터셋
 ├── docs/                       # 문서
-│   ├── BASELINE_CODE.md        # 베이스라인 가이드
-│   ├── overview_agents.md      # 대회 가이드
-│   ├── evaluation.md           # 평가 방식
-│   └── datasetguide.md         # 데이터셋 가이드
+│   ├── getting-started/        # 신규 사용자 가이드
+│   │   ├── QUICK_START.md      # 5분 시작 가이드
+│   │   ├── UV_ENVIRONMENT_GUIDE.md
+│   │   └── BASELINE_CODE.md
+│   ├── advanced/               # 고급 전략
+│   │   ├── ADVANCED_STRATEGIES.md  # 최신 기법 (2024-2025)
+│   │   └── EXPERIMENT_LESSONS.md   # 실험 교훈
+│   ├── competition/            # 대회 공식 문서
+│   │   ├── overview_agents.md
+│   │   ├── agent_spec_gec_ko.md
+│   │   ├── datasetguide.md
+│   │   └── evaluation.md
+│   └── code/                   # 코드 문서
+│       ├── GENERATOR_ARCHITECTURE.md
+│       └── MIGRATION_GUIDE.md
 ├── tasks/                      # PRD 및 태스크
 │   ├── prd-gec-prompt-optimization-system.md
-│   ├── tasks-prd-gec-prompt-optimization-system.md
-│   └── analysis_summary.md
-├── logs/                       # 실험 로그 (생성 예정)
-└── submissions/                # 제출 파일 (생성 예정)
+│   └── tasks-prd-gec-prompt-optimization-system.md
+├── outputs/logs/               # 실험 로그
+│   ├── EXPERIMENT_LOG_SUMMARY.md
+│   └── experiments/            # 상세 분석
+└── code/outputs/submissions/   # 제출 파일
 ```
 
 ## 3. Data Description

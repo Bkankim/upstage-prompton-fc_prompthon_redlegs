@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 from src.prompts.registry import get_registry, register_default_prompts
+from src.postprocessors.rule_checklist import RuleChecklistPostprocessor
 
 
 class SentenceGenerator:
@@ -24,7 +25,8 @@ class SentenceGenerator:
         self,
         prompt_name: str,
         model: str = "solar-pro2",
-        api_key: Optional[str] = None
+        api_key: Optional[str] = None,
+        enable_postprocessing: bool = True
     ):
         """
         생성기 초기화
@@ -33,6 +35,7 @@ class SentenceGenerator:
             prompt_name: 사용할 프롬프트 이름 (registry에서 조회)
             model: 사용할 모델 이름 (기본값: solar-pro2)
             api_key: Upstage API 키 (None인 경우 환경변수에서 로드)
+            enable_postprocessing: 후처리 활성화 여부 (기본값: True)
 
         Raises:
             ValueError: API 키가 없거나 프롬프트를 찾을 수 없는 경우
@@ -70,6 +73,33 @@ class SentenceGenerator:
 
         self.model = model
         self.prompt_name = prompt_name
+        self.enable_postprocessing = enable_postprocessing
+
+        # 후처리 모듈 초기화
+        if enable_postprocessing:
+            self.postprocessor = RuleChecklistPostprocessor()
+        else:
+            self.postprocessor = None
+
+    def _apply_postprocessing(self, original: str, corrected: str) -> str:
+        """
+        후처리 적용
+
+        Args:
+            original: 원문 텍스트
+            corrected: 교정된 텍스트
+
+        Returns:
+            str: 후처리된 텍스트
+        """
+        if self.postprocessor is None:
+            return corrected
+
+        try:
+            return self.postprocessor.process(original, corrected)
+        except Exception as e:
+            print(f"Warning: Postprocessing failed - {e}")
+            return corrected
 
     def generate_single(self, text: str) -> str:
         """
@@ -93,7 +123,11 @@ class SentenceGenerator:
             )
 
             corrected = resp.choices[0].message.content.strip()
-            return corrected
+
+            # 후처리 적용
+            final = self._apply_postprocessing(text, corrected)
+
+            return final
 
         except Exception as e:
             print(f"Error processing: {text[:50]}... - {e}")

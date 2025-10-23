@@ -25,8 +25,8 @@ cd code && uv sync
 echo "UPSTAGE_API_KEY=your_key_here" > .env
 
 # 4. 실행 예시 (반드시 uv run 사용!)
-uv run python baseline_generate.py  # ✅ 올바른 방법
-# python baseline_generate.py       # ❌ 절대 금지!
+uv run python scripts/generate.py --prompt baseline  # ✅ 올바른 방법
+# python scripts/generate.py                         # ❌ 절대 금지!
 ```
 
 ## 1. Competition Info
@@ -50,11 +50,16 @@ uv run python baseline_generate.py  # ✅ 올바른 방법
 
 ```
 ├── code/                       # 베이스라인 및 실험 코드
-│   ├── baseline_generate.py    # 교정 실행
-│   ├── evaluate.py             # 평가 실행
-│   ├── metrics.py              # 평가 메트릭
-│   ├── prompts.py              # 프롬프트 템플릿 (핵심)
-│   ├── analyze_dataset.py      # 데이터 분석
+│   ├── scripts/                # 실행 스크립트
+│   │   ├── generate.py         # 교정 실행 (통합 스크립트)
+│   │   ├── evaluate.py         # 평가 실행
+│   │   └── run_experiment.py   # 실험 자동화
+│   ├── src/                    # 소스 모듈
+│   │   ├── prompts/            # 프롬프트 템플릿 (핵심)
+│   │   ├── metrics/            # 평가 메트릭
+│   │   ├── generator.py        # 통합 생성기
+│   │   └── evaluator.py        # 평가 클래스
+│   ├── tests/                  # 테스트 (85개)
 │   └── data/                   # 데이터셋
 ├── docs/                       # 문서
 │   ├── BASELINE_CODE.md        # 베이스라인 가이드
@@ -79,7 +84,7 @@ uv run python baseline_generate.py  # ✅ 올바른 방법
 
 ### EDA
 
-- 오류 유형별 분포 분석 완료 (`analyze_dataset.py`)
+- 오류 유형별 분포 분석 완료
 - 평균 문장 길이: 136.8자
 - 60%는 교정 후 길이 변화 없음
 - 주요 패턴: 조사 오류, 맞춤법, 띄어쓰기

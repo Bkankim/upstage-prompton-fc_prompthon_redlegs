@@ -1,0 +1,231 @@
+{
+  "experiment": {
+    "name": "baseline",
+    "version": "v1.0",
+    "timestamp": "2025-10-22T23:14:43.650137",
+    "model": "solar-pro2",
+    "prompt_file": "prompts.py",
+    "prompt_version": "baseline_prompt"
+  },
+  "dataset": {
+    "train_samples": 254,
+    "input_file": "data/train_dataset.csv",
+    "output_file": "submission_baseline.csv",
+    "analysis_file": "analysis_baseline.csv"
+  },
+  "performance": {
+    "overall": {
+      "recall": 32.24,
+      "precision": 14.08,
+      "tp": 79,
+      "fp": 68,
+      "fm": 98,
+      "fr": 414
+    },
+    "by_error_type": {
+      "논리오류": {
+        "tp": 0,
+        "fp": 0,
+        "fm": 3,
+        "fr": 9,
+        "total_corrections": 3,
+        "recall": 0.0
+      },
+      "누락": {
+        "tp": 2,
+        "fp": 2,
+        "fm": 6,
+        "fr": 31,
+        "total_corrections": 10,
+        "recall": 20.0
+      },
+      "능동피동": {
+        "tp": 2,
+        "fp": 1,
+        "fm": 3,
+        "fr": 18,
+        "total_corrections": 6,
+        "recall": 33.33
+      },
+      "단순오탈자": {
+        "tp": 5,
+        "fp": 6,
+        "fm": 6,
+        "fr": 13,
+        "total_corrections": 17,
+        "recall": 29.41
+      },
+      "단위": {
+        "tp": 6,
+        "fp": 7,
+        "fm": 7,
+        "fr": 27,
+        "total_corrections": 20,
+        "recall": 30.0
+      },
+      "띄어쓰기": {
+        "tp": 0,
+        "fp": 0,
+        "fm": 1,
+        "fr": 2,
+        "total_corrections": 1,
+        "recall": 0.0
+      },
+      "맞춤법": {
+        "tp": 7,
+        "fp": 1,
+        "fm": 0,
+        "fr": 5,
+        "total_corrections": 8,
+        "recall": 87.5
+      },
+      "문법-어미-잘못된준말테케에없음": {
+        "tp": 2,
+        "fp": 6,
+        "fm": 2,
+        "fr": 3,
+        "total_corrections": 10,
+        "recall": 20.0
+      },
+      "문법-용언불규칙활용오류테케에없음": {
+        "tp": 5,
+        "fp": 0,
+        "fm": 0,
+        "fr": 0,
+        "total_corrections": 5,
+        "recall": 100.0
+      },
+      "문법-품사에따른활용": {
+        "tp": 3,
+        "fp": 3,
+        "fm": 6,
+        "fr": 4,
+        "total_corrections": 12,
+        "recall": 25.0
+      },
+      "문장부호": {
+        "tp": 4,
+        "fp": 2,
+        "fm": 2,
+        "fr": 18,
+        "total_corrections": 8,
+        "recall": 50.0
+      },
+      "받침에따른": {
+        "tp": 2,
+        "fp": 1,
+        "fm": 3,
+        "fr": 16,
+        "total_corrections": 6,
+        "recall": 33.33
+      },
+      "비문": {
+        "tp": 0,
+        "fp": 3,
+        "fm": 4,
+        "fr": 27,
+        "total_corrections": 7,
+        "recall": 0.0
+      },
+      "사이시옷": {
+        "tp": 7,
+        "fp": 10,
+        "fm": 11,
+        "fr": 24,
+        "total_corrections": 28,
+        "recall": 25.0
+      },
+      "어휘관련오류": {
+        "tp": 6,
+        "fp": 6,
+        "fm": 10,
+        "fr": 53,
+        "total_corrections": 22,
+        "recall": 27.27
+      },
+      "외래어": {
+        "tp": 1,
+        "fp": 0,
+        "fm": 0,
+        "fr": 7,
+        "total_corrections": 1,
+        "recall": 100.0
+      },
+      "조사오류": {
+        "tp": 16,
+        "fp": 9,
+        "fm": 16,
+        "fr": 85,
+        "total_corrections": 41,
+        "recall": 39.02
+      },
+      "중복": {
+        "tp": 3,
+        "fp": 2,
+        "fm": 5,
+        "fr": 28,
+        "total_corrections": 10,
+        "recall": 30.0
+      },
+      "표준어비표준어": {
+        "tp": 7,
+        "fp": 7,
+        "fm": 10,
+        "fr": 31,
+        "total_corrections": 24,
+        "recall": 29.17
+      },
+      "표현다듬기": {
+        "tp": 1,
+        "fp": 2,
+        "fm": 3,
+        "fr": 13,
+        "total_corrections": 6,
+        "recall": 16.67
+      }
+    }
+  },
+  "insights": {
+    "strengths": [
+      "맞춤법 오류 처리 우수 (Recall 87.5%)",
+      "외래어 오류 완벽 처리 (Recall 100%)",
+      "용언 불규칙 활용 완벽 처리 (Recall 100%)"
+    ],
+    "weaknesses": [
+      "논리오류 전혀 처리 못함 (Recall 0%)",
+      "띄어쓰기 오류 처리 못함 (Recall 0%)",
+      "비문 처리 못함 (Recall 0%)",
+      "조사오류 낮은 처리율 (Recall 39%)",
+      "사이시옷 낮은 처리율 (Recall 25%)",
+      "불필요한 교정 과다 (FR=414)"
+    ],
+    "improvement_directions": [
+      "조사 오류 처리를 위한 Few-shot 예시 추가",
+      "표준어/비표준어 구분 강화",
+      "문법 오류 유형 명시적 지시",
+      "비문 및 논리오류 처리 전략 수립",
+      "불필요한 교정 줄이기 위한 보수적 접근"
+    ]
+  },
+  "leaderboard": {
+    "submission_file": "submissions/submission_baseline_test.csv",
+    "train_performance": {
+      "recall": 32.24,
+      "precision": 14.08
+    },
+    "public_lb_performance": {
+      "recall": 34.0426,
+      "precision": 13.2231
+    },
+    "difference": {
+      "recall_diff": 1.8,
+      "precision_diff": -0.86,
+      "note": "Public LB가 Train보다 Recall +1.80%p, Precision -0.86%p"
+    },
+    "analysis": {
+      "generalization": "Good - Public LB Recall이 Train보다 높음",
+      "overfitting_risk": "Low - 성능 차이가 작음",
+      "goal_gap": "40.96%p improvement needed to reach 75% target"
+    }
+  }
+}

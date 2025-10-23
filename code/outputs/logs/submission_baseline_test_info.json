@@ -1,0 +1,18 @@
+{
+  "submission": {
+    "name": "baseline_test",
+    "version": "v1.0",
+    "timestamp": "2025-10-22T23:23:04.767138",
+    "model": "solar-pro2",
+    "prompt": "baseline_prompt"
+  },
+  "dataset": {
+    "input_file": "data/test.csv",
+    "output_file": "submissions/submission_baseline_test.csv",
+    "samples": 110
+  },
+  "expected_performance": {
+    "train_recall": 32.24,
+    "note": "Public LB 점수 확인 예정"
+  }
+}

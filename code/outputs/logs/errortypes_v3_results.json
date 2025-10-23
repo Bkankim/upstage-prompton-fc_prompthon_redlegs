@@ -1,0 +1,192 @@
+{
+  "experiment": {
+    "name": "errortypes_v3",
+    "version": "v3.0",
+    "model": "solar-pro2",
+    "prompt_type": "Error type checklist (10 items)",
+    "checklist": [
+      "띄어쓰기",
+      "맞춤법",
+      "문장부호",
+      "조사",
+      "표준어",
+      "사이시옷",
+      "능동피동",
+      "문법",
+      "비문",
+      "논리오류"
+    ]
+  },
+  "performance": {
+    "overall": {
+      "recall": 32.24,
+      "precision": 15.22,
+      "tp": 79,
+      "fp": 62,
+      "fm": 104,
+      "fr": 378
+    },
+    "by_error_type": {
+      "조사오류": {
+        "tp": 13,
+        "fp": 10,
+        "fm": 18,
+        "fr": 83,
+        "total_corrections": 41,
+        "recall": 31.71
+      },
+      "맞춤법": {
+        "tp": 8,
+        "fp": 0,
+        "fm": 0,
+        "fr": 4,
+        "total_corrections": 8,
+        "recall": 100.0
+      },
+      "비문": {
+        "tp": 0,
+        "fp": 3,
+        "fm": 4,
+        "fr": 21,
+        "total_corrections": 7,
+        "recall": 0.0
+      },
+      "사이시옷": {
+        "tp": 9,
+        "fp": 8,
+        "fm": 11,
+        "fr": 27,
+        "total_corrections": 28,
+        "recall": 32.14
+      },
+      "표준어비표준어": {
+        "tp": 10,
+        "fp": 7,
+        "fm": 8,
+        "fr": 22,
+        "total_corrections": 25,
+        "recall": 40.0
+      },
+      "문법-품사에따른활용": {
+        "tp": 3,
+        "fp": 2,
+        "fm": 7,
+        "fr": 7,
+        "total_corrections": 12,
+        "recall": 25.0
+      },
+      "단위": {
+        "tp": 6,
+        "fp": 7,
+        "fm": 7,
+        "fr": 23,
+        "total_corrections": 20,
+        "recall": 30.0
+      },
+      "외래어": {
+        "tp": 1,
+        "fp": 0,
+        "fm": 0,
+        "fr": 4,
+        "total_corrections": 1,
+        "recall": 100.0
+      },
+      "문법-어미-잘못된준말테케에없음": {
+        "tp": 1,
+        "fp": 6,
+        "fm": 3,
+        "fr": 5,
+        "total_corrections": 10,
+        "recall": 10.0
+      },
+      "어휘관련오류": {
+        "tp": 6,
+        "fp": 6,
+        "fm": 10,
+        "fr": 42,
+        "total_corrections": 22,
+        "recall": 27.27
+      },
+      "단순오탈자": {
+        "tp": 5,
+        "fp": 5,
+        "fm": 7,
+        "fr": 15,
+        "total_corrections": 17,
+        "recall": 29.41
+      },
+      "문장부호": {
+        "tp": 3,
+        "fp": 1,
+        "fm": 5,
+        "fr": 19,
+        "total_corrections": 9,
+        "recall": 33.33
+      },
+      "표현다듬기": {
+        "tp": 1,
+        "fp": 2,
+        "fm": 3,
+        "fr": 12,
+        "total_corrections": 6,
+        "recall": 16.67
+      },
+      "능동피동": {
+        "tp": 2,
+        "fp": 0,
+        "fm": 4,
+        "fr": 18,
+        "total_corrections": 6,
+        "recall": 33.33
+      },
+      "누락": {
+        "tp": 2,
+        "fp": 2,
+        "fm": 6,
+        "fr": 33,
+        "total_corrections": 10,
+        "recall": 20.0
+      },
+      "받침에따른": {
+        "tp": 2,
+        "fp": 1,
+        "fm": 3,
+        "fr": 17,
+        "total_corrections": 6,
+        "recall": 33.33
+      },
+      "중복": {
+        "tp": 3,
+        "fp": 2,
+        "fm": 5,
+        "fr": 19,
+        "total_corrections": 10,
+        "recall": 30.0
+      },
+      "문법-용언불규칙활용오류테케에없음": {
+        "tp": 5,
+        "fp": 0,
+        "fm": 0,
+        "fr": 0,
+        "total_corrections": 5,
+        "recall": 100.0
+      },
+      "논리오류": {
+        "tp": 0,
+        "fp": 0,
+        "fm": 3,
+        "fr": 8,
+        "total_corrections": 3,
+        "recall": 0.0
+      },
+      "띄어쓰기": {
+        "tp": 0,
+        "fp": 0,
+        "fm": 1,
+        "fr": 2,
+        "total_corrections": 1,
+        "recall": 0.0
+      }
+    }
+  }
+}

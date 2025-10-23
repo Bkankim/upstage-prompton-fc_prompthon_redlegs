@@ -1,0 +1,62 @@
+{
+  "baseline_performance": {
+    "public_recall": 34.0426,
+    "target_recall": 75.0,
+    "gap": 40.96,
+    "status": "Good generalization, but significant improvement needed"
+  },
+  "priority_improvements": [
+    {
+      "priority": 1,
+      "name": "Few-shot 예시 추가",
+      "target_errors": [
+        "조사오류 (39%)",
+        "표준어/비표준어 (29%)",
+        "사이시옷 (25%)"
+      ],
+      "expected_improvement": "+10-15%p",
+      "implementation": "약점 오류 유형의 예시를 프롬프트에 추가"
+    },
+    {
+      "priority": 2,
+      "name": "오류 유형 명시적 지시",
+      "target_errors": [
+        "논리오류 (0%)",
+        "띄어쓰기 (0%)",
+        "비문 (0%)"
+      ],
+      "expected_improvement": "+5-10%p",
+      "implementation": "각 오류 유형을 명시하고 중점 확인 요청"
+    },
+    {
+      "priority": 3,
+      "name": "Chain-of-Thought 추가",
+      "target_errors": [
+        "복잡한 문법 오류",
+        "문맥 의존 오류"
+      ],
+      "expected_improvement": "+5-8%p",
+      "implementation": "단계별 추론 과정 유도"
+    },
+    {
+      "priority": 4,
+      "name": "Multi-turn 검증",
+      "target_errors": [
+        "False Missing 감소"
+      ],
+      "expected_improvement": "+3-5%p",
+      "implementation": "2단계 검증 프로세스"
+    }
+  ],
+  "next_experiment": {
+    "name": "Few-shot v2",
+    "description": "Train 데이터 분석 기반 Few-shot 예시 추가",
+    "examples_to_add": [
+      "조사오류: 모습은 → 모습이",
+      "표준어: 동태 → 동대, 눈 깜빡할 → 눈 깜짝할",
+      "사이시옷: 뒤머리, 빗물, 나뭇가지",
+      "능동피동: 부딪쳐 → 부딪혀",
+      "문법: 답답하자 → 답답해서"
+    ]
+  }
+}

@@ -1,28 +1,36 @@
 ## Relevant Files
 
-- `code/prompts.py` - 프롬프트 템플릿 정의 (핵심 수정 대상)
-- `code/baseline_generate.py` - 교정 문장 생성 실행 스크립트
-- `code/evaluate.py` - 평가 메트릭 계산 실행 스크립트
-- `code/metrics.py` - Recall/Precision 계산 로직
-- `code/analyze_dataset.py` - 데이터셋 오류 패턴 분석 도구
-- `code/experiments/prompt_manager.py` - 프롬프트 버전 관리 시스템 (생성 예정)
-- `code/experiments/batch_runner.py` - 배치 실험 실행기 (생성 예정)
-- `code/experiments/result_analyzer.py` - 실험 결과 분석기 (생성 예정)
-- `code/experiments/optimizer.py` - 최적 템플릿 선택기 (생성 예정)
-- `code/experiments/submission_generator.py` - 최종 제출 파일 생성기 (생성 예정)
-- `code/logs/baseline_results.json` - 베이스라인 성능 문서 (Recall 32.24%)
-- `code/submission_baseline.csv` - 베이스라인 교정 결과 (254개 샘플)
-- `code/analysis_baseline.csv` - 베이스라인 상세 분석 (TP/FP/FM/FR)
-- `code/fewshot_v2_generate.py` - Few-shot v2 프롬프트 실행 스크립트
-- `code/logs/fewshot_v2_results.json` - Few-shot v2 성능 문서 (Recall 35.92%)
-- `code/submission_fewshot_v2.csv` - Few-shot v2 교정 결과 (254개 샘플)
-- `code/analysis_fewshot_v2.csv` - Few-shot v2 상세 분석
-- `code/logs/comparison_baseline_vs_fewshot_v2.json` - 베이스라인 vs Few-shot v2 비교 분석
-- `code/errortypes_v3_generate.py` - Error Types v3 프롬프트 실행 스크립트
-- `code/logs/errortypes_v3_results.json` - Error Types v3 성능 문서 (Recall 32.24%, 개선 실패)
-- `code/submission_errortypes_v3.csv` - Error Types v3 교정 결과
-- `code/analysis_errortypes_v3.csv` - Error Types v3 상세 분석
-- `code/logs/comparison_3prompts.json` - 3가지 프롬프트 비교 분석
+### 핵심 소스 코드 (src/)
+- `code/src/prompts/` - 프롬프트 템플릿 모듈 (핵심 수정 대상)
+  - `baseline.py` - 베이스라인 프롬프트
+  - `fewshot_v2.py` - Few-shot v2 프롬프트
+  - `errortypes_v3.py` - Error Types v3 프롬프트
+  - `registry.py` - 프롬프트 레지스트리 (자동 등록 및 조회)
+- `code/src/generator.py` - 통합 문장 생성기 클래스
+- `code/src/evaluator.py` - 평가 클래스
+- `code/src/metrics/lcs.py` - LCS 알고리즘
+- `code/src/metrics/evaluator.py` - Recall/Precision 계산 로직
+
+### 실행 스크립트 (scripts/)
+- `code/scripts/generate.py` - 교정 실행 (통합 스크립트, --prompt 인자로 선택)
+- `code/scripts/evaluate.py` - 평가 실행
+- `code/scripts/run_experiment.py` - 전체 워크플로우 (교정 + 평가 + LB 제출 파일)
+- `code/scripts/verify_setup.py` - 환경 검증 스크립트
+
+### 실험 결과 (outputs/)
+- `code/outputs/logs/baseline_results.json` - 베이스라인 성능 (Recall 32.24%)
+- `code/outputs/logs/fewshot_v2_results.json` - Few-shot v2 성능 (Recall 35.92%)
+- `code/outputs/logs/errortypes_v3_results.json` - Error Types v3 성능 (Recall 32.24%)
+- `code/outputs/logs/comparison_*.json` - 프롬프트 비교 분석
+- `code/outputs/submissions/train/` - Train 데이터 교정 결과
+- `code/outputs/submissions/test/` - LB 제출 파일
+- `code/outputs/analysis/` - 상세 분석 CSV
+
+### 테스트 (tests/)
+- `code/tests/test_prompts.py` - 프롬프트 모듈 테스트 (24개)
+- `code/tests/test_generator.py` - 생성기 테스트 (17개)
+- `code/tests/test_metrics.py` - 메트릭 테스트 (26개)
+- `code/tests/test_evaluator.py` - 평가기 테스트 (18개)
 
 ### Notes
 
@@ -40,8 +48,8 @@
   - [x] 1.1 환경 설정 및 의존성 설치 확인 (uv sync)
   - [x] 1.2 API 키 설정 확인 (.env 파일)
   - [x] 1.3 데이터 파일 배치 확인 (code/data/train_dataset.csv)
-  - [x] 1.4 베이스라인 프롬프트로 교정 실행 (baseline_generate.py)
-  - [x] 1.5 베이스라인 Recall 점수 측정 (evaluate.py)
+  - [x] 1.4 베이스라인 프롬프트로 교정 실행 (scripts/generate.py --prompt baseline)
+  - [x] 1.5 베이스라인 Recall 점수 측정 (scripts/evaluate.py)
   - [x] 1.6 오류 유형별 분석 결과 검토 (analysis.csv)
   - [x] 1.7 베이스라인 성능 문서화 (logs/baseline_results.json)
 

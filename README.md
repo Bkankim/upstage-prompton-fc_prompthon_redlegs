@@ -128,75 +128,71 @@ uv run python scripts/generate.py --prompt baseline  # ✅ 올바른 방법
 
 ## 5. Result
 
-### Leader Board (2025-10-23 기준)
+### Final Result (Phase 1-6 완료)
 
 ```yaml
-최고 성능:
+최종 확정:
   - Public LB: 34.0426%
   - Private LB: 13.4454%
-  - 프롬프트: Baseline (Response Cleaning)
+  - 프롬프트: Baseline (맞춤법 예시 1개)
   - 파일: outputs/submissions/test/submission_baseline_test_clean.csv
+  - 상태: 최종 확정 ✅
 
-진행 중:
-  - 개선 버전: 콜론 버그 수정 + 문법 규칙 복원
-  - Train Recall: 33.88%
-  - 상태: LB 제출 대기
+사용 제출: 4회 / 20회 (16회 남음)
 
-주요 이슈:
-  - Public/Private 격차: 약 20%p (비정상적)
-  - 일반적 격차: 5-10%p
-  - 추정 원인: 데이터 분포 차이
+주요 발견:
+  - 1개 예시가 최적점 (0개: 보수적, 4개: 과적합)
+  - Train 성능 향상 = Test 성능 하락
+  - Public/Private 격차 20%p (근본적 한계)
+  - 규칙 기반 후처리 효과 없음
 ```
 
-### Experiment Log
+### Experiment Summary
 
 **전체 실험 이력**: [EXPERIMENT_LOG_SUMMARY.md](outputs/logs/EXPERIMENT_LOG_SUMMARY.md)
 
-| # | 프롬프트 | Train Recall | Public LB | Private LB | 상태 |
-|---|---------|--------------|-----------|------------|------|
-| 1 | **Baseline** | 32.24% | **34.04%** | **13.45%** | ✅ 최고 |
-| 2 | Few-shot v2 | 35.92% | 31.91% | 12.10% | ❌ 과적합 |
-| 6 | Rule-Checklist (버그) | 33.88% | 31.91% | 12.80% | ❌ 콜론 버그 |
-| 7 | **Rule-Checklist (개선)** | 33.88% | ? | ? | 🔄 제출 대기 |
+| Phase | 프롬프트 | 예시 | Public | Private | Train | 결과 |
+|-------|---------|------|--------|---------|-------|------|
+| 1 | **Baseline** | **1개** | **34.04%** | **13.45%** | 32.24% | ✅ **최종** |
+| 2 | Zero-shot | 0개 | 31.91% | 12.61% | 32.24% | ❌ 보수적 |
+| 2 | Plus3 | 4개 | 27.66% | 9.77% | 34.69% | ❌ 과적합 |
+| 3 | 조사 | 1개 | 31.91% | 11.54% | 33.47% | ❌ 특화 실패 |
+| 3 | 띄어쓰기 | 1개 | - | - | 32.65% | ❌ 폐기 |
+| 6 | 규칙 후처리 | - | - | - | 32.24% | ❌ 효과 없음 |
 
-### 전문가 조언 기반 개선 전략
+### 핵심 교훈
 
-**상세 문서**: [EXPERT_ADVICE_STRATEGY.md](docs/advanced/EXPERT_ADVICE_STRATEGY.md)
-
+#### 1. Few-shot의 양날의 검
 ```
-우선순위:
-
-[오늘 즉시]
-1. 규칙별 순효과 분석 (문법 규칙 유지/제거 결정)
-2. 60% 길이 가드 구현 (83% 손실 재발 방지)
-3. 개선 버전 LB 제출 (콜론 버그 수정 효과 검증)
-
-[내일]
-4. 5-fold 교차검증 (Public/Private 격차 원인 규명)
-5. 유형별 성과 분석 (취약 유형 식별)
-6. 프롬프트 형식 제약 A/B (메타데이터 억제)
-
-[목표]
-- Public: 35-36%, Private: 14-15%
-- Public/Private 격차: 20%p → 15%p 이하
-- 일관성 있는 성능 확보
+0개 (Zero-shot): 31.91% - 보수적 (FN 증가)
+1개 (Baseline):  34.04% - 최적 균형 ✅
+4개 (Plus3):     27.66% - 과적합 (일반화 실패)
 ```
 
-### 최근 발견 및 수정
+#### 2. 예시 설계의 중요성
+- 다양성 > 특화: 맞춤법 예시 (3가지 오류) > 조사/띄어쓰기 (1가지 오류)
+- 단일 예시의 복잡도가 중요
 
-**콜론 버그 (해결 완료)**:
-- 문제: "7:3" → "3" 변환으로 83% 텍스트 손실 (8개 케이스)
-- 원인: 비율/시간 표기를 메타데이터 콜론으로 오인
-- 해결: 3단계 검증 로직 구현 (숫자 패턴 체크 → 위치 체크 → 키워드 체크)
-- 검증: test_improved_logic.py 통과
+#### 3. Train 성능은 무의미
+- Train 향상 → Test 하락 (모든 실험)
+- **Train은 Test의 지표가 아님**
 
-**전략 변경**:
-```diff
-- ❌ 기존: 고급 프롬프트 기법 (CD-CoT, ToT) 우선
-+ ✅ 변경: 기본 안정화 + 일반화 문제 해결 우선
+#### 4. Baseline의 강력함
+- 명확한 규칙은 이미 100% 교정
+- "금새→금세", "치 않→지 않" 등 완벽 처리
+- **규칙 기반 후처리로 개선 불가능**
 
-이유: Public/Private 격차(20%p)가 더 심각한 문제
-```
+#### 5. 근본적 한계
+- Public/Private 격차 20%p
+- 데이터 분포 차이 (구조적 문제)
+- 프롬프트 개선으로 해결 불가
+
+### 상세 분석 문서
+
+- **실험 종합**: [FINAL_EXPERIMENT_SUMMARY.md](outputs/analysis/FINAL_EXPERIMENT_SUMMARY.md)
+- **Plus3 실패 분석**: [FAILURE_ANALYSIS_BASELINE_PLUS_3EXAMPLES.md](outputs/analysis/FAILURE_ANALYSIS_BASELINE_PLUS_3EXAMPLES.md)
+- **규칙 후처리 실험**: [FINAL_MINIMAL_RULES_EXPERIMENT.md](outputs/analysis/FINAL_MINIMAL_RULES_EXPERIMENT.md)
+- **전문가 조언 전략**: [EXPERT_ADVICE_STRATEGY.md](docs/advanced/EXPERT_ADVICE_STRATEGY.md)
 
 ## etc
 

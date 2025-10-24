@@ -341,56 +341,128 @@ code/outputs/logs/
 
 ---
 
-## 10) 빠른 명령어
+## 10) Phase 6: 규칙 기반 후처리 실험 (2025-10-24)
 
-### 오늘 즉시 실행
-```bash
-# 1. 규칙별 순효과 분석
-cd code
-uv run python analyze_grammar_rule_effects.py
+### 실험 목적
+- Baseline이 놓친 명확한 오류를 규칙으로 보충
+- False Positive ≈ 0%인 규칙만 사용
+- 원문 = Baseline 출력일 때만 적용
 
-# 2. 60% 길이 가드 테스트
-uv run python test_length_guard.py
+### 추출한 규칙
+Train 데이터 분석으로 명확한 패턴 3개 추출:
+1. `금새` → `금세` (100% 확실)
+2. `치 않` → `지 않` (95%+ 확실)
+3. `추측컨대` → `추측건대` (100% 확실)
 
-# 3. 개선 버전 교정 실행 (필요 시)
-uv run python scripts/run_experiment.py --prompt baseline
+### MinimalRulePostprocessor 구현
+- 60% 길이 가드 (과도한 삭제 방지)
+- 150% 길이 가드 (과도한 추가 방지)
+- Baseline이 이미 교정한 것은 절대 건드리지 않음
 
-# 결과 확인
-cat outputs/analysis/grammar_rule_effects.csv
+### Train 검증 결과 (254개)
+```yaml
+규칙 적용: 0개
+Recall: 32.24% (Baseline과 동일)
+Precision: 12.80%
+
+TP: 296
+FP: 2016
+FN: 622
 ```
 
-### 내일 실행
-```bash
-# 4. 5-fold 교차검증
-uv run python analyze_cross_validation.py
+### 실패 원인 분석
+**Baseline이 이미 모든 명확한 규칙을 100% 처리하고 있음**
 
-# 5. 유형별 성과 분석
-uv run python analyze_error_type_performance.py
+검증:
+- Train 데이터에 패턴 존재 확인 (grep 검증)
+- 하지만 Baseline이 이미 모두 교정
+- 원문 ≠ Baseline 출력 → 규칙 적용 조건 불충족
+- 따라서 규칙 적용 0개
 
-# 6. 프롬프트 A/B 실험
-uv run python prompt_ab_test.py
+### 핵심 발견
+1. **Baseline 프롬프트의 강력함**
+   - "금새→금세", "치 않→지 않" 등 명확한 규칙 100% 교정
+   - 규칙 기반 후처리가 개입할 여지 없음
 
-# 결과 확인
-cat outputs/analysis/cross_validation_results.json
-cat outputs/analysis/error_type_performance.csv
-```
+2. **Baseline의 진짜 한계**
+   - 명확한 규칙을 못 잡아서가 아님
+   - 복잡한 문맥 이해 필요
+   - 애매한 오류 (주관적 판단 필요)
 
-### LB 제출 파일 확인
-```bash
-# 최고 성능 파일
-cat outputs/submissions/test/submission_baseline_test_clean.csv
+3. **규칙 기반 접근의 한계**
+   - Train 분석으로 패턴을 찾아도 소용없음
+   - Baseline이 이미 처리 → 개선 불가
+   - 새로운 규칙 추가 → False Positive 위험
 
-# 개선 버전 파일 (콜론 버그 수정)
-cat outputs/baseline_test.csv
-
-# "7:3" 패턴 보존 확인
-grep "7:3" outputs/baseline_test.csv
-```
+### 결론
+**규칙 기반 후처리 전략 폐기**
+- 더 이상의 시도 불필요
+- Baseline 34.04% 최종 확정
 
 ---
 
-**핵심 메시지**:
-- 기본 안정화 우선 (규칙 검증 + 길이 가드)
-- 일반화 문제 해결 (교차검증 + 유형 분석)
-- Public/Private 격차 축소 (20%p → 15%p 이하)
-- 목표: 일관성 있는 성능 확보!
+## 11) 최종 결론 (Phase 1-6 완료)
+
+### 전체 실험 요약
+
+| Phase | 접근법 | 예시 | Public | Private | Train | 결과 |
+|-------|--------|------|--------|---------|-------|------|
+| 1 | **Baseline** | **1개** | **34.04%** | **13.45%** | 32.24% | ✅ **최종** |
+| 2 | Zero-shot | 0개 | 31.91% | 12.61% | 32.24% | ❌ 보수적 |
+| 2 | Plus3 | 4개 | 27.66% | 9.77% | 34.69% | ❌ 과적합 |
+| 3 | 조사 | 1개 | 31.91% | 11.54% | 33.47% | ❌ 특화 |
+| 3 | 띄어쓰기 | 1개 | - | - | 32.65% | ❌ 폐기 |
+| 6 | 규칙 후처리 | - | - | - | 32.24% | ❌ 효과 없음 |
+
+**사용 제출**: 4회 / 20회 (16회 남음)
+
+### 핵심 교훈
+
+#### 1. Few-shot의 양날의 검
+```
+0개: 31.91% - 보수적 (FN 증가)
+1개: 34.04% - 최적 균형 ✅
+4개: 27.66% - 과적합 (일반화 실패)
+```
+
+#### 2. 예시 설계의 중요성
+- 다양성 > 특화
+- 맞춤법 예시 (3가지 오류) > 조사/띄어쓰기 (1가지 오류)
+
+#### 3. Train 성능은 무의미
+- Train 향상 → Test 하락 (모든 실험)
+- Train은 Test의 지표가 아님
+
+#### 4. Baseline의 강력함
+- 명확한 규칙은 이미 100% 교정
+- 규칙 기반 후처리로 개선 불가능
+
+#### 5. 근본적 한계
+- Public/Private 격차 20%p
+- 데이터 분포 차이 (구조적 문제)
+- 프롬프트 개선으로 해결 불가
+
+### 최종 권장사항
+
+**Baseline 34.04%를 최종 제출로 확정**
+- 파일: `outputs/submissions/test/submission_baseline_test_clean.csv`
+- 더 이상의 Few-shot/규칙 실험 불필요
+- 16회 제출 남음
+
+**완전히 다른 접근 (선택적, 리스크 높음)**:
+1. System message 변경
+2. JSON 구조화 출력
+3. Multi-turn 대화
+
+**주의**: 모든 개선 시도가 실패했음을 고려
+
+---
+
+**상세 문서**:
+- **실험 종합**: `/outputs/analysis/FINAL_EXPERIMENT_SUMMARY.md`
+- **Plus3 실패 분석**: `/outputs/analysis/FAILURE_ANALYSIS_BASELINE_PLUS_3EXAMPLES.md`
+- **규칙 후처리 실험**: `/outputs/analysis/FINAL_MINIMAL_RULES_EXPERIMENT.md`
+- **전략 문서**: `/docs/advanced/EXPERT_ADVICE_STRATEGY.md`
+
+**최종 업데이트**: 2025-10-24
+**상태**: Phase 1-6 모두 완료, Baseline 34.04% 최종 확정 ✅

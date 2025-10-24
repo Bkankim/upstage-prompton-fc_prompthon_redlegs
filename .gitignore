@@ -4,10 +4,20 @@
 /models/
 /submission/
 /tests/
-/ai-dev-tasks-main/
-/docs/session_handover.md
-AGENTS.md
-CLAUDE.md
+
+# 레거시 문서 (통합 완료)
+/docs/getting-started/
+/docs/advanced/
+/docs/code/
+/docs/competition/
+
+# 프로젝트 관리 폴더
+.claude/
+tasks/
+
+# 백업 파일
+code_backup_*.tar.gz
+*.tar.gz.bak
 
 # 가상환경, OS별 파일 등 일반적인 제외 항목 (필요 시 추가)
 # Python

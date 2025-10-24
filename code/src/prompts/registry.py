@@ -1,105 +1,44 @@
 """
-프롬프트 레지스트리 클래스
+프롬프트 레지스트리 - 간소화 버전
+
+scripts에서 프롬프트 클래스를 이름으로 조회할 수 있도록 하는 레지스트리
 """
 
-from typing import Dict, List, Optional
+from typing import Dict, Type
 from .base import BasePrompt
+from .baseline import BaselinePrompt
+from .zero_shot import ZeroShotPrompt
+from .baseline_josa import BaselineJosaPrompt
+from .baseline_plus_3examples import BaselinePlus3ExamplesPrompt
 
 
-class PromptRegistry:
+# 프롬프트 레지스트리 (이름 → 클래스 매핑)
+_REGISTRY: Dict[str, Type[BasePrompt]] = {}
+
+
+def register_default_prompts():
     """
-    프롬프트 레지스트리
-    프롬프트 클래스를 등록하고 조회하는 기능 제공
+    기본 프롬프트를 레지스트리에 등록
+
+    등록되는 프롬프트:
+    - baseline: BaselinePrompt (맞춤법 1개 예시, 최고 성능)
+    - zero_shot: ZeroShotPrompt (예시 0개)
+    - baseline_josa: BaselineJosaPrompt (조사 1개 예시)
+    - baseline_plus_3examples: BaselinePlus3ExamplesPrompt (4개 예시)
     """
-
-    def __init__(self):
-        """레지스트리 초기화"""
-        self._prompts: Dict[str, BasePrompt] = {}
-
-    def register(self, prompt: BasePrompt) -> None:
-        """
-        프롬프트 등록
-
-        Args:
-            prompt: 등록할 프롬프트 인스턴스
-        """
-        self._prompts[prompt.name] = prompt
-
-    def get(self, name: str) -> Optional[BasePrompt]:
-        """
-        프롬프트 조회
-
-        Args:
-            name: 프롬프트 이름
-
-        Returns:
-            BasePrompt: 프롬프트 인스턴스 또는 None
-        """
-        return self._prompts.get(name)
-
-    def list_prompts(self) -> List[str]:
-        """
-        사용 가능한 프롬프트 목록 반환
-
-        Returns:
-            List[str]: 프롬프트 이름 목록
-        """
-        return list(self._prompts.keys())
-
-    def __contains__(self, name: str) -> bool:
-        """
-        프롬프트 존재 여부 확인
-
-        Args:
-            name: 프롬프트 이름
-
-        Returns:
-            bool: 존재 여부
-        """
-        return name in self._prompts
+    _REGISTRY['baseline'] = BaselinePrompt
+    _REGISTRY['zero_shot'] = ZeroShotPrompt
+    _REGISTRY['baseline_josa'] = BaselineJosaPrompt
+    _REGISTRY['baseline_plus_3examples'] = BaselinePlus3ExamplesPrompt
 
 
-# 전역 레지스트리 인스턴스
-_global_registry = PromptRegistry()
-
-
-def get_registry() -> PromptRegistry:
+def get_registry() -> Dict[str, Type[BasePrompt]]:
     """
-    전역 레지스트리 인스턴스 반환
+    프롬프트 레지스트리 반환
 
     Returns:
-        PromptRegistry: 전역 레지스트리
+        Dict[str, Type[BasePrompt]]: 프롬프트 이름 → 클래스 매핑
     """
-    return _global_registry
-
-
-def register_default_prompts() -> None:
-    """
-    기본 프롬프트들을 레지스트리에 자동 등록
-    """
-    from .baseline import BaselinePrompt
-    from .baseline_plus_3examples import BaselinePlus3ExamplesPrompt
-    from .baseline_strict import BaselineStrictPrompt
-    from .baseline_strict_v2 import BaselineStrictV2Prompt
-    from .baseline_spacing import BaselineSpacingPrompt
-    from .baseline_josa import BaselineJosaPrompt
-    from .fewshot_v2 import FewshotV2Prompt
-    from .fewshot_v3 import FewShotV3Prompt
-    from .fewshot_v3_enhanced import FewShotV3EnhancedPrompt
-    from .fewshot_v3_improved import FewShotV3ImprovedPrompt
-    from .errortypes_v3 import ErrorTypesV3Prompt
-    from .zero_shot import ZeroShotPrompt
-
-    registry = get_registry()
-    registry.register(BaselinePrompt())
-    registry.register(BaselinePlus3ExamplesPrompt())
-    registry.register(BaselineStrictPrompt())
-    registry.register(BaselineStrictV2Prompt())
-    registry.register(BaselineSpacingPrompt())
-    registry.register(BaselineJosaPrompt())
-    registry.register(FewshotV2Prompt())
-    registry.register(FewShotV3Prompt())
-    registry.register(FewShotV3EnhancedPrompt())
-    registry.register(FewShotV3ImprovedPrompt())
-    registry.register(ErrorTypesV3Prompt())
-    registry.register(ZeroShotPrompt())
+    if not _REGISTRY:
+        register_default_prompts()
+    return _REGISTRY

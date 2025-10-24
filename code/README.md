@@ -1,350 +1,284 @@
-# 한국어 문법 교정 시스템
+# 코드 구조
 
-Upstage Global Eval Challenge (GEC) - Promptathon 대회를 위한 한국어 문법 교정 시스템입니다. 프롬프트 엔지니어링을 통해 Solar Pro 2 모델로 문법 교정을 수행하며, Recall 최대화를 목표로 합니다.
-
-## 프로젝트 구조
+## 디렉토리 구조
 
 ```
 code/
-├── src/                          # 핵심 소스 코드
-│   ├── prompts/                  # 프롬프트 관리
-│   │   ├── base.py              # 프롬프트 기본 추상 클래스
-│   │   ├── baseline.py          # 베이스라인 프롬프트
-│   │   ├── fewshot_v2.py        # Few-shot 프롬프트
-│   │   ├── errortypes_v3.py     # 오류 유형별 프롬프트
-│   │   ├── registry.py          # 프롬프트 레지스트리
-│   │   └── __init__.py
-│   ├── metrics/                  # 평가 메트릭
-│   │   ├── lcs.py               # LCS 기반 차이점 검출
-│   │   ├── evaluator.py         # Recall/Precision 계산
-│   │   └── __init__.py
-│   ├── generator.py              # 문장 생성기 (통합)
-│   └── evaluator.py              # 평가 실행기
-├── scripts/                      # 실행 스크립트
-│   ├── generate.py              # 문장 생성 스크립트
-│   ├── evaluate.py              # 평가 실행 스크립트
-│   └── run_experiment.py        # 실험 통합 실행
-├── tests/                        # 테스트 코드
-│   ├── test_prompts.py          # 프롬프트 테스트
-│   ├── test_metrics.py          # 메트릭 테스트
-│   ├── test_generator.py        # 생성기 테스트
-│   └── test_evaluator.py        # 평가기 테스트
-├── data/                         # 데이터 파일
-│   ├── train.csv                # 학습 데이터 (254개)
-│   ├── test.csv                 # 테스트 데이터 (109개)
-│   └── sample_submissioncsv.csv # 제출 형식 샘플
-├── outputs/                      # 실험 결과 (Git 제외)
-├── configs/                      # 설정 파일
-├── docs/                         # 문서
-│   └── MIGRATION_GUIDE.md       # 마이그레이션 가이드
-├── pyproject.toml                # Python 의존성 정의
-├── .python-version               # Python 3.12
-├── .env                          # API 키 설정 (Git 제외)
-└── README.md                     # 이 파일
+├── scripts/               # 실행 스크립트
+│   ├── generate.py        # 교정 실행
+│   ├── evaluate.py        # 평가 실행
+│   ├── run_experiment.py  # 통합 실험 (교정 + 평가 + Test 생성)
+│   └── verify_setup.py    # 환경 검증
+├── src/                   # 소스 모듈
+│   ├── prompts/           # 프롬프트 템플릿
+│   │   ├── base.py        # 기본 클래스
+│   │   ├── baseline.py    # 최고 성능 (34.04%)
+│   │   ├── zero_shot.py   # 실패 사례 1 (31.91%)
+│   │   ├── baseline_plus_3examples.py  # 실패 사례 2 (27.66%)
+│   │   └── baseline_josa.py            # 실패 사례 3 (31.91%)
+│   ├── metrics/           # 평가 지표
+│   │   ├── evaluator.py   # Recall/Precision 계산
+│   │   └── lcs.py         # LCS 알고리즘
+│   ├── postprocessors/    # 후처리
+│   │   ├── base.py
+│   │   ├── enhanced_postprocessor.py
+│   │   ├── minimal_rule.py    # Phase 6 규칙 기반
+│   │   └── rule_checklist.py
+│   ├── generator.py       # 교정 생성기
+│   └── evaluator.py       # 평가 클래스 (레거시)
+├── tests/                 # 단위 테스트 (85개)
+│   ├── test_prompts.py
+│   ├── test_evaluator.py
+│   ├── test_generator.py
+│   ├── test_metrics.py
+│   └── test_postprocessors.py
+├── data/                  # 데이터셋
+│   ├── train.csv          # 254개
+│   └── test.csv           # 109개
+├── outputs/               # 실험 결과
+│   ├── submissions/       # 교정 결과 CSV
+│   ├── logs/              # 평가 메트릭 JSON
+│   └── analysis/          # 상세 분석 CSV
+├── pyproject.toml         # 의존성 정의
+├── .python-version        # Python 3.12
+└── .env                   # API 키 (git 제외)
 ```
 
-## 빠른 시작
+---
 
-### 1. 환경 설정
+## 핵심 모듈
 
-이 프로젝트는 **uv**를 사용하여 Python 환경을 관리합니다.
+### 1. Prompts (`src/prompts/`)
+
+모든 프롬프트의 기본 클래스:
+```python
+# src/prompts/base.py
+class BasePrompt:
+    def get_prompt(self, err_sentence: str) -> dict:
+        """Upstage API 형식의 프롬프트 반환"""
+        raise NotImplementedError
+```
+
+**주요 프롬프트:**
+
+| 파일 | 클래스 | 예시 | 성능 | 상태 |
+|------|--------|------|------|------|
+| `baseline.py` | BaselinePrompt | 1개 | 34.04% | [완료] 최고 |
+| `zero_shot.py` | ZeroShotPrompt | 0개 | 31.91% | [실패] 보수적 |
+| `baseline_plus_3examples.py` | BaselinePlus3ExamplesPrompt | 4개 | 27.66% | [실패] 과적합 |
+| `baseline_josa.py` | BaselineJosaPrompt | 1개 (조사) | 31.91% | [실패] 특화 실패 |
+
+### 2. Generator (`src/generator.py`)
+
+```python
+class Generator:
+    """
+    프롬프트를 사용해 교정 문장을 생성
+    """
+    def generate(self, prompt_class, data: pd.DataFrame) -> List[str]:
+        # 1. 각 케이스별로 프롬프트 생성
+        # 2. Upstage API 호출 (최대 3회)
+        # 3. 응답 정제 (메타데이터 제거)
+        # 4. 결과 반환
+```
+
+### 3. Evaluator (`src/metrics/evaluator.py`)
+
+```python
+class Evaluator:
+    """
+    LCS 기반 Recall/Precision 계산
+    """
+    def evaluate(self, true_df, pred_df) -> dict:
+        # TP/FP/FN 계산
+        # Recall = TP / (TP + FP + FN) × 100
+        # Precision = TP / (TP + FP) × 100
+```
+
+### 4. Postprocessors (`src/postprocessors/`)
+
+후처리기 (메타데이터 제거, 규칙 적용 등):
+
+- `enhanced_postprocessor.py`: 메타데이터 제거 시도
+- `rule_checklist.py`: 국립국어원 규칙 기반
+- `minimal_rule.py`: Phase 6 실험 (규칙 적용 0개)
+
+---
+
+## 실험 스크립트 (6개 보존)
+
+### 핵심 실험
+
+| 파일 | 목적 | 사용 Phase |
+|------|------|-----------|
+| `validate_baseline_minimal_rules.py` | Phase 6 규칙 후처리 검증 | Phase 6 |
+| `analyze_fewshot_failure.py` | Plus3 실패 분석 | Phase 2 |
+| `extract_clear_rules.py` | Train 데이터에서 규칙 추출 | Phase 6 |
+| `compare_versions.py` | 프롬프트 간 비교 | Phase 3-5 |
+| `select_phase3_samples.py` | Phase 3 샘플 선택 | Phase 3 |
+| `generate_test_submission.py` | Test 제출 파일 생성 | 전체 |
+
+---
+
+## 사용 방법
+
+### 환경 설정
 
 ```bash
-# uv 설치 (필요한 경우)
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# 프로젝트 디렉토리로 이동
-cd /Competition/upstage-prompton-fc_prompthon_redlegs/code
+# code 디렉토리로 이동
+cd code
 
 # 의존성 설치
 uv sync
+
+# API 키 설정
+echo "UPSTAGE_API_KEY=your_key" > .env
 ```
 
-### 2. API 키 설정
+### 실험 실행
 
-`.env` 파일을 생성하고 Upstage API 키를 설정합니다.
+**통합 스크립트** (권장):
+```bash
+# Train 교정 + 평가 + Test 생성을 한 번에
+uv run python scripts/run_experiment.py --prompt baseline
+```
+
+**개별 스크립트**:
+```bash
+# 1. Train 데이터 교정
+uv run python scripts/generate.py --prompt baseline
+
+# 2. 평가 실행
+uv run python scripts/evaluate.py
+
+# 3. Test 데이터 교정 (LB 제출용)
+uv run python generate_test_submission.py
+```
+
+### 테스트 실행
 
 ```bash
-echo "UPSTAGE_API_KEY=your_api_key_here" > .env
-```
-
-### 3. 문장 교정 생성
-
-프롬프트를 선택하여 문장 교정을 수행합니다.
-
-```bash
-# 베이스라인 프롬프트 사용
-uv run python scripts/generate.py --prompt baseline --input data/test.csv --output outputs/baseline_test.csv
-
-# Few-shot 프롬프트 사용
-uv run python scripts/generate.py --prompt fewshot_v2 --input data/test.csv --output outputs/fewshot_v2_test.csv
-
-# 오류 유형별 프롬프트 사용
-uv run python scripts/generate.py --prompt errortypes_v3 --input data/test.csv --output outputs/errortypes_v3_test.csv
-```
-
-### 4. 평가 실행
-
-생성된 결과를 평가합니다.
-
-```bash
-uv run python scripts/evaluate.py --truth data/train.csv --prediction outputs/baseline_test.csv
-```
-
-### 5. 통합 실험 실행
-
-생성과 평가를 한 번에 수행합니다.
-
-```bash
-uv run python scripts/run_experiment.py --prompt baseline --input data/train.csv --output outputs/baseline_train.csv
-```
-
-## 사용 예시
-
-### Python 코드에서 사용하기
-
-#### 1. 프롬프트 레지스트리 사용
-
-```python
-from src.prompts.registry import get_registry, register_default_prompts
-
-# 기본 프롬프트 등록
-register_default_prompts()
-
-# 레지스트리 조회
-registry = get_registry()
-
-# 사용 가능한 프롬프트 목록
-print(registry.list_prompts())
-# ['baseline', 'fewshot_v2', 'errortypes_v3']
-
-# 특정 프롬프트 조회
-prompt = registry.get("baseline")
-print(prompt.name)  # 'baseline'
-
-# 프롬프트를 메시지로 변환
-messages = prompt.to_messages("오늘 날씨가 않좋다")
-```
-
-#### 2. SentenceGenerator 사용
-
-```python
-from src.generator import SentenceGenerator
-
-# 생성기 초기화 (프롬프트 이름 지정)
-generator = SentenceGenerator(
-    prompt_name="baseline",
-    model="solar-pro2"
-)
-
-# 단일 문장 교정
-corrected = generator.generate_single("오늘 날씨가 않좋다")
-print(corrected)  # "오늘 날씨가 안 좋다"
-
-# 배치 교정
-sentences = ["문장1", "문장2", "문장3"]
-result_df = generator.generate_batch(sentences)
-
-# CSV 파일 처리
-generator.generate_from_csv(
-    input_path="data/test.csv",
-    output_path="outputs/result.csv"
-)
-```
-
-#### 3. Evaluator 사용
-
-```python
-import pandas as pd
-from src.evaluator import Evaluator
-
-# 평가기 초기화
-evaluator = Evaluator()
-
-# 정답 데이터 로드
-true_df = pd.read_csv("data/train.csv")
-
-# 예측 데이터 로드
-pred_df = pd.read_csv("outputs/baseline_train.csv")
-
-# 평가 수행
-results = evaluator.evaluate(true_df, pred_df)
-
-# 결과 출력
-print(f"Recall: {results['recall']:.2f}%")
-print(f"Precision: {results['precision']:.2f}%")
-print(f"True Positives: {results['true_positives']}")
-print(f"False Positives: {results['false_positives']}")
-print(f"False Missings: {results['false_missings']}")
-
-# 상세 분석 데이터
-analysis_df = results['analysis_df']
-```
-
-## 새 프롬프트 추가 방법
-
-프롬프트 시스템은 확장 가능한 구조로 설계되어 있습니다. 새로운 프롬프트를 쉽게 추가할 수 있습니다.
-
-### 1. 프롬프트 클래스 작성
-
-`src/prompts/` 디렉토리에 새 파일을 생성합니다 (예: `mypromppt_v1.py`).
-
-```python
-"""
-커스텀 프롬프트 클래스
-"""
-
-from .base import BasePrompt
-
-
-class MyPromptV1(BasePrompt):
-    """
-    커스텀 프롬프트 설명
-    """
-
-    @property
-    def name(self) -> str:
-        """프롬프트 이름 반환"""
-        return "myprompt_v1"
-
-    def system_message(self) -> str:
-        """
-        시스템 메시지 반환
-        시스템 메시지가 필요 없으면 빈 문자열 반환
-        """
-        return "당신은 한국어 문법 교정 전문가입니다."
-
-    def format_user_message(self, text: str) -> str:
-        """
-        사용자 메시지 포맷팅
-
-        Args:
-            text: 교정할 원문 텍스트
-
-        Returns:
-            str: 포맷팅된 프롬프트
-        """
-        template = """다음 문장을 교정하세요:
-
-원문: {text}
-
-교정:"""
-        return template.format(text=text)
-```
-
-### 2. 레지스트리에 등록
-
-`src/prompts/registry.py` 파일의 `register_default_prompts()` 함수를 수정합니다.
-
-```python
-def register_default_prompts() -> None:
-    """
-    기본 프롬프트들을 레지스트리에 자동 등록
-    """
-    from .baseline import BaselinePrompt
-    from .fewshot_v2 import FewshotV2Prompt
-    from .errortypes_v3 import ErrorTypesV3Prompt
-    from .myprompt_v1 import MyPromptV1  # 추가
-
-    registry = get_registry()
-    registry.register(BaselinePrompt())
-    registry.register(FewshotV2Prompt())
-    registry.register(ErrorTypesV3Prompt())
-    registry.register(MyPromptV1())  # 추가
-```
-
-### 3. 사용하기
-
-이제 새 프롬프트를 다른 프롬프트와 동일하게 사용할 수 있습니다.
-
-```bash
-# CLI에서 사용
-uv run python scripts/generate.py --prompt myprompt_v1 --input data/test.csv --output outputs/myprompt_v1_test.csv
-
-# Python 코드에서 사용
-from src.generator import SentenceGenerator
-
-generator = SentenceGenerator(prompt_name="myprompt_v1")
-result = generator.generate_single("오늘 날씨가 않좋다")
-```
-
-## 테스트 실행
-
-프로젝트의 모든 테스트를 실행합니다.
-
-```bash
-# 전체 테스트 실행
+# 전체 테스트 (85개)
 uv run pytest tests/ -v
 
-# 특정 테스트 파일만 실행
-uv run pytest tests/test_prompts.py -v
-
-# 커버리지 포함 테스트
+# 커버리지 확인
 uv run pytest tests/ --cov=src --cov-report=html
 ```
 
-## 평가 메트릭 설명
+---
 
-### Recall (재현율)
+## 결과물 확인
 
-- 정의: `TP / (TP + FP + FM) × 100`
-- 의미: 실제 오류 중 얼마나 교정했는가
-- 대회 목표: Recall 최대화
+### Train 결과
 
-### Precision (정밀도)
+```bash
+# 교정 파일
+cat outputs/submissions/train/submission_baseline.csv
 
-- 정의: `TP / (TP + FP + FR) × 100`
-- 의미: 교정한 것 중 얼마나 정확한가
+# 평가 메트릭
+cat outputs/logs/baseline_results.json
 
-### 용어 설명
+# 상세 분석
+cat outputs/analysis/analysis_baseline.csv
+```
 
-- **TP (True Positive)**: 올바르게 교정한 부분
-- **FP (False Positive)**: 잘못 교정한 부분
-- **FM (False Missing)**: 놓친 오류 (교정하지 않음)
-- **FR (False Redundant)**: 불필요한 교정 (정상 부분을 수정)
+### Test 결과 (LB 제출용)
 
-## 프롬프트 종류
+```bash
+# LB 제출 파일
+cat outputs/submissions/test/submission_baseline_test.csv
 
-### 1. baseline
+# 파일 형식 확인
+head -3 outputs/submissions/test/submission_baseline_test.csv
+# id,err_sentence,cor_sentence
+# grm123456,"오류 문장","교정 문장"
+```
 
-- 단순하고 직접적인 교정 지시
-- Few-shot 예시 1개 포함
-- 가장 간단한 구조
+---
 
-### 2. fewshot_v2
+## 새로운 프롬프트 추가
 
-- Few-shot Learning 기반
-- 다양한 오류 유형별 예시 제공
-- System message 포함
+### 1. 프롬프트 클래스 작성
 
-### 3. errortypes_v3
+```python
+# src/prompts/my_prompt.py
+from src.prompts.base import BasePrompt
 
-- 오류 유형별 상세 분석
-- 단계별 추론 과정 포함
-- 가장 복잡한 구조
+class MyPrompt(BasePrompt):
+    def get_prompt(self, err_sentence: str) -> dict:
+        return {
+            "messages": [
+                {
+                    "role": "system",
+                    "content": "당신은 한국어 전문가입니다..."
+                },
+                {
+                    "role": "user",
+                    "content": f"<원문>\n{err_sentence}\n<교정>\n"
+                }
+            ]
+        }
+```
 
-## 대회 제약사항
+### 2. 실험 실행
 
-- 세션당 최대 토큰: 2000
-- 케이스당 최대 API 호출: 3회
-- 일일 제출 제한: 20회 (KST 자정 리셋)
-- 외부 데이터 사용 금지
-- RAG는 제공 데이터셋 내부만 허용
+```bash
+uv run python scripts/run_experiment.py --prompt my_prompt
+```
 
-## 기술 스택
+### 3. 결과 확인
 
-- Python 3.12
-- uv (패키지 관리)
-- Upstage Solar Pro 2 (교정 모델)
-- OpenAI SDK (API 통신)
-- pandas (데이터 처리)
-- pytest (테스트)
+```bash
+cat outputs/logs/my_prompt_results.json
+```
 
-## 라이선스
+---
 
-이 프로젝트는 대회 참여를 위한 코드이며, 외부 공유나 상업적 이용은 허용되지 않습니다.
+## 주의사항
 
-## 문의
+### 필수: uv 환경 사용
 
-- 대회 관련: Upstage Global Eval Challenge 운영진
-- 기술 문제: 코드 이슈 트래커 활용
+```bash
+# [완료] 올바른 방법
+uv run python scripts/generate.py
+
+# [실패] 절대 금지 (의존성 오류)
+python scripts/generate.py
+python3 scripts/generate.py
+```
+
+### API 제약사항
+
+- 세션당 2000 토큰 제한
+- 케이스당 최대 3회 API 호출
+- 일일 제출 20회 제한
+
+### 데이터 경로
+
+```python
+# 절대 경로 권장
+DATA_PATH = "code/data/train.csv"
+
+# 상대 경로 (code/ 디렉토리 기준)
+DATA_PATH = "data/train.csv"
+```
+
+---
+
+## 참고 자료
+
+### 프로젝트 문서
+
+- **실험 인사이트**: [docs/02_EXPERIMENT_INSIGHTS.md](../docs/02_EXPERIMENT_INSIGHTS.md)
+- **기술 상세**: [docs/03_TECHNICAL_DETAILS.md](../docs/03_TECHNICAL_DETAILS.md)
+- **시작 가이드**: [docs/01_GETTING_STARTED.md](../docs/01_GETTING_STARTED.md)
+
+### 외부 링크
+
+- Upstage API: https://console.upstage.ai/docs
+- uv 패키지 관리자: https://github.com/astral-sh/uv
+
+---
+
+**마지막 업데이트**: 2025-10-24
+**구조 개편**: 80+ 스크립트 → 6개 핵심 + 5개 프롬프트로 정리

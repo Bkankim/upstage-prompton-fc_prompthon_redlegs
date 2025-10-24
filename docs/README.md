@@ -12,7 +12,7 @@
    - 프로젝트 구조 이해
    - 핵심 명령어
 
-2. **[02_EXPERIMENT_INSIGHTS.md](./02_EXPERIMENT_INSIGHTS.md)** - 실험 인사이트 ⭐ 필독
+2. **[02_EXPERIMENT_INSIGHTS.md](./02_EXPERIMENT_INSIGHTS.md)** - 실험 인사이트 [중요] 필독
    - Phase 1-6 실험 여정
    - 주요 실패 사례 및 원인 분석
    - 핵심 발견 5가지
@@ -32,27 +32,27 @@
 
 ### 레거시 문서 (참고용)
 
-아래 문서들은 통합 문서로 대체되었습니다:
+아래 문서들은 핵심 문서 5개로 통합되었습니다:
 
-#### getting-started/ (→ 01_GETTING_STARTED.md)
-- ~~QUICK_START.md~~
-- ~~UV_ENVIRONMENT_GUIDE.md~~
-- ~~BASELINE_CODE.md~~
+#### getting-started/ (삭제됨, → 01_GETTING_STARTED.md)
+- QUICK_START.md
+- UV_ENVIRONMENT_GUIDE.md (삭제)
+- BASELINE_CODE.md
 
 #### advanced/ (→ 02_EXPERIMENT_INSIGHTS.md + 03_TECHNICAL_DETAILS.md)
-- ~~ADVANCED_STRATEGIES.md~~
-- ~~EXPERT_ADVICE_STRATEGY.md~~
-- ~~EXPERIMENT_LESSONS.md~~
+- ADVANCED_STRATEGIES.md
+- EXPERT_ADVICE_STRATEGY.md
+- EXPERIMENT_LESSONS.md
 
-#### code/ (→ 03_TECHNICAL_DETAILS.md)
-- ~~GENERATOR_ARCHITECTURE.md~~
-- ~~MIGRATION_GUIDE.md~~
+#### code/ (삭제됨, → 03_TECHNICAL_DETAILS.md)
+- GENERATOR_ARCHITECTURE.md
+- MIGRATION_GUIDE.md (삭제)
 
-#### competition/ (→ 04_COMPETITION_GUIDE.md)
-- ~~overview_agents.md~~
-- ~~agent_spec_gec_ko.md~~
-- ~~datasetguide.md~~
-- ~~evaluation.md~~
+#### competition/ (삭제됨, → 04_COMPETITION_GUIDE.md)
+- overview_agents.md
+- agent_spec_gec_ko.md (삭제)
+- datasetguide.md
+- evaluation.md
 
 ---
 

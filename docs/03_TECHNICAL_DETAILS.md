@@ -67,10 +67,10 @@ class BasePrompt:
 
 | 클래스 | 예시 개수 | 특징 | 성능 |
 |--------|-----------|------|------|
-| **BaselinePrompt** | 1개 | 다양한 오류 유형 포함 | **34.04%** ✅ |
+| **BaselinePrompt** | 1개 | 다양한 오류 유형 포함 | **34.04%** [완료] |
 | ZeroShotPrompt | 0개 | 예시 없음, 보수적 | 31.91% |
-| BaselinePlus3ExamplesPrompt | 4개 | 과적합 발생 | 27.66% ❌ |
-| BaselineJosaPrompt | 1개 | 조사 특화, 일반화 실패 | 31.91% ❌ |
+| BaselinePlus3ExamplesPrompt | 4개 | 과적합 발생 | 27.66% [실패] |
+| BaselineJosaPrompt | 1개 | 조사 특화, 일반화 실패 | 31.91% [실패] |
 
 #### 3. Evaluator (`src/metrics/evaluator.py`)
 

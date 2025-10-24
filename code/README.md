@@ -63,10 +63,10 @@ class BasePrompt:
 
 | 파일 | 클래스 | 예시 | 성능 | 상태 |
 |------|--------|------|------|------|
-| `baseline.py` | BaselinePrompt | 1개 | 34.04% | ✅ 최고 |
-| `zero_shot.py` | ZeroShotPrompt | 0개 | 31.91% | ❌ 보수적 |
-| `baseline_plus_3examples.py` | BaselinePlus3ExamplesPrompt | 4개 | 27.66% | ❌ 과적합 |
-| `baseline_josa.py` | BaselineJosaPrompt | 1개 (조사) | 31.91% | ❌ 특화 실패 |
+| `baseline.py` | BaselinePrompt | 1개 | 34.04% | [완료] 최고 |
+| `zero_shot.py` | ZeroShotPrompt | 0개 | 31.91% | [실패] 보수적 |
+| `baseline_plus_3examples.py` | BaselinePlus3ExamplesPrompt | 4개 | 27.66% | [실패] 과적합 |
+| `baseline_josa.py` | BaselineJosaPrompt | 1개 (조사) | 31.91% | [실패] 특화 실패 |
 
 ### 2. Generator (`src/generator.py`)
 
@@ -239,10 +239,10 @@ cat outputs/logs/my_prompt_results.json
 ### 필수: uv 환경 사용
 
 ```bash
-# ✅ 올바른 방법
+# [완료] 올바른 방법
 uv run python scripts/generate.py
 
-# ❌ 절대 금지 (의존성 오류)
+# [실패] 절대 금지 (의존성 오류)
 python scripts/generate.py
 python3 scripts/generate.py
 ```

@@ -122,11 +122,11 @@ code/
 **중요: 모든 실행은 반드시 `uv run` 사용!**
 
 ```bash
-# ✅ 올바른 방법
+# [완료] 올바른 방법
 uv run python scripts/generate.py --prompt baseline
 uv run python scripts/evaluate.py
 
-# ❌ 절대 금지 (의존성 오류 발생)
+# [실패] 절대 금지 (의존성 오류 발생)
 python scripts/generate.py
 python3 scripts/evaluate.py
 ```

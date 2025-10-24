@@ -41,10 +41,10 @@ Test 데이터(109개)에 대한 LB 제출용 파일:
 
 | 파일 | Public LB | Private LB | 결과 |
 |------|-----------|------------|------|
-| `submission_baseline_test_clean.csv` | **34.04%** | **13.45%** | ✅ **최고** |
-| `submission_zero_shot_test.csv` | 31.91% | 12.61% | ⚠️ 보수적 |
-| `submission_baseline_josa_test.csv` | 31.91% | 11.54% | ❌ 특화 실패 |
-| `submission_baseline_plus_3examples_test.csv` | 27.66% | 9.77% | ❌ 과적합 |
+| `submission_baseline_test_clean.csv` | **34.04%** | **13.45%** | [완료] **최고** |
+| `submission_zero_shot_test.csv` | 31.91% | 12.61% | [주의] 보수적 |
+| `submission_baseline_josa_test.csv` | 31.91% | 11.54% | [실패] 특화 실패 |
+| `submission_baseline_plus_3examples_test.csv` | 27.66% | 9.77% | [실패] 과적합 |
 
 **사용 제출**: 4회 / 20회 (16회 남음)
 
@@ -85,10 +85,10 @@ Test 데이터(109개)에 대한 LB 제출용 파일:
 
 | 프롬프트 | Train Recall | Public LB | 격차 |
 |---------|--------------|-----------|------|
-| Baseline | 32.24% | **34.04%** | +1.80%p (일반화 우수) ✅ |
+| Baseline | 32.24% | **34.04%** | +1.80%p (일반화 우수) [완료] |
 | Zero-shot | 32.24% | 31.91% | -0.33%p |
-| Plus3 | **34.69%** | **27.66%** | **-7.03%p** (과적합) ❌ |
-| 조사 | 33.47% | 31.91% | -1.56%p (특화 실패) ❌ |
+| Plus3 | **34.69%** | **27.66%** | **-7.03%p** (과적합) [실패] |
+| 조사 | 33.47% | 31.91% | -1.56%p (특화 실패) [실패] |
 
 **교훈**: Train 성능 향상 → Test 성능 하락 (과적합)
 
@@ -108,9 +108,9 @@ grm123456,"오류","정답","예측",10,12,8,4,2
 
 ### 주요 분석 파일
 
-- `FINAL_EXPERIMENT_SUMMARY.md`: Phase 1-5 종합 분석 ⭐
-- `FAILURE_ANALYSIS_BASELINE_PLUS_3EXAMPLES.md`: Plus3 실패 상세 분석 ⭐
-- `FINAL_MINIMAL_RULES_EXPERIMENT.md`: Phase 6 규칙 후처리 실험 ⭐
+- `FINAL_EXPERIMENT_SUMMARY.md`: Phase 1-5 종합 분석 [중요]
+- `FAILURE_ANALYSIS_BASELINE_PLUS_3EXAMPLES.md`: Plus3 실패 상세 분석 [중요]
+- `FINAL_MINIMAL_RULES_EXPERIMENT.md`: Phase 6 규칙 후처리 실험 [중요]
 
 **통합 문서**: [docs/02_EXPERIMENT_INSIGHTS.md](../docs/02_EXPERIMENT_INSIGHTS.md)
 
@@ -122,12 +122,12 @@ grm123456,"오류","정답","예측",10,12,8,4,2
 
 | Phase | 프롬프트 | 예시 | Train | Public | Private | 결과 |
 |-------|---------|------|-------|--------|---------|------|
-| 1 | **Baseline** | **1개** | 32.24 | **34.04** | **13.45** | ✅ **최고** |
-| 2 | Zero-shot | 0개 | 32.24 | 31.91 | 12.61 | ⚠️ 보수적 |
-| 2 | Plus3 | 4개 | 34.69 | 27.66 | 9.77 | ❌ 과적합 |
-| 3 | 조사 | 1개 (조사) | 33.47 | 31.91 | 11.54 | ❌ 특화 실패 |
-| 3 | 띄어쓰기 | 1개 (띄어쓰기) | 32.65 | - | - | ❌ 폐기 (길이 폭발) |
-| 6 | 규칙 후처리 | - | 32.24 | - | - | ❌ 규칙 적용 0개 |
+| 1 | **Baseline** | **1개** | 32.24 | **34.04** | **13.45** | [완료] **최고** |
+| 2 | Zero-shot | 0개 | 32.24 | 31.91 | 12.61 | [주의] 보수적 |
+| 2 | Plus3 | 4개 | 34.69 | 27.66 | 9.77 | [실패] 과적합 |
+| 3 | 조사 | 1개 (조사) | 33.47 | 31.91 | 11.54 | [실패] 특화 실패 |
+| 3 | 띄어쓰기 | 1개 (띄어쓰기) | 32.65 | - | - | [실패] 폐기 (길이 폭발) |
+| 6 | 규칙 후처리 | - | 32.24 | - | - | [실패] 규칙 적용 0개 |
 
 ### 핵심 발견
 
@@ -208,7 +208,7 @@ uv run python generate_test_submission.py
 
 ### 프로젝트 문서
 
-- **실험 인사이트**: [../docs/02_EXPERIMENT_INSIGHTS.md](../docs/02_EXPERIMENT_INSIGHTS.md) ⭐ 필독
+- **실험 인사이트**: [../docs/02_EXPERIMENT_INSIGHTS.md](../docs/02_EXPERIMENT_INSIGHTS.md) [중요] 필독
 - **기술 상세**: [../docs/03_TECHNICAL_DETAILS.md](../docs/03_TECHNICAL_DETAILS.md)
 - **대회 정보**: [../docs/04_COMPETITION_GUIDE.md](../docs/04_COMPETITION_GUIDE.md)
 

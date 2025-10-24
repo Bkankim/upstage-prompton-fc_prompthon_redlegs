@@ -1,31 +1,23 @@
 """
-Prompt module
-Provides prompt classes and registry
+프롬프트 템플릿 모듈
+
+사용 가능한 프롬프트:
+- BaselinePrompt: 맞춤법 1개 예시 (최고 성능)
+- ZeroShotPrompt: 예시 0개
+- BaselineJosaPrompt: 조사 1개 예시
+- BaselinePlus3ExamplesPrompt: 4개 예시
 """
 
 from .base import BasePrompt
 from .baseline import BaselinePrompt
-from .baseline_strict import BaselineStrictPrompt
-from .baseline_strict_v2 import BaselineStrictV2Prompt
-from .fewshot_v2 import FewshotV2Prompt
-from .fewshot_v3 import FewShotV3Prompt
-from .fewshot_v3_enhanced import FewShotV3EnhancedPrompt
-from .errortypes_v3 import ErrorTypesV3Prompt
-from .registry import PromptRegistry, get_registry, register_default_prompts
-
-# Auto-register default prompts on module import
-register_default_prompts()
+from .zero_shot import ZeroShotPrompt
+from .baseline_josa import BaselineJosaPrompt
+from .baseline_plus_3examples import BaselinePlus3ExamplesPrompt
 
 __all__ = [
-    "BasePrompt",
-    "BaselinePrompt",
-    "BaselineStrictPrompt",
-    "BaselineStrictV2Prompt",
-    "FewshotV2Prompt",
-    "FewShotV3Prompt",
-    "FewShotV3EnhancedPrompt",
-    "ErrorTypesV3Prompt",
-    "PromptRegistry",
-    "get_registry",
-    "register_default_prompts",
+    'BasePrompt',
+    'BaselinePrompt',
+    'ZeroShotPrompt',
+    'BaselineJosaPrompt',
+    'BaselinePlus3ExamplesPrompt',
 ]

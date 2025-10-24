@@ -1,0 +1,236 @@
+"""
+Baseline + 3 Examples Test 생성
+
+목표:
+- Train 검증 완료 (Recall 34.69%)
+- Test 110개 생성
+- LB 제출 파일 생성
+"""
+
+import pandas as pd
+import json
+import re
+from pathlib import Path
+from src.generator import SentenceGenerator
+
+
+def detect_metadata(text):
+    """메타데이터 패턴 탐지"""
+    if pd.isna(text):
+        return False
+    patterns = [r'원문:', r'교정:', r'<원문>', r'<교정>', r'\[최종', r'※', r'#']
+    for pattern in patterns:
+        if re.search(pattern, text):
+            return True
+    return False
+
+
+def check_number_separation(original, corrected):
+    """숫자 분리 체크"""
+    original_decimals = re.findall(r'\d+\.\d+', original)
+    corrected_decimals = re.findall(r'\d+\.\d+', corrected)
+
+    if len(original_decimals) > len(corrected_decimals):
+        separated = re.findall(r'\d+\.\s+\d+', corrected)
+        if separated:
+            return True, separated
+
+    return False, []
+
+
+def generate_baseline_plus_3examples_test():
+    """
+    Baseline + 3 Examples Test 생성
+    """
+    print("="*70)
+    print("Baseline + 3 Examples Test 생성")
+    print("="*70)
+    print()
+
+    # Test 데이터 로드
+    test_df = pd.read_csv(Path(__file__).parent / "data" / "test.csv")
+
+    print(f"Test 샘플: {len(test_df)}개")
+    print()
+
+    # Generator 초기화
+    print("프롬프트: baseline_plus_3examples")
+    print("후처리: RuleChecklist (안전)")
+    print()
+    print("Train 성능: Recall 34.69% (기존 32.24% +2.45%p)")
+    print("기대 LB: 35-37%")
+    print()
+
+    generator = SentenceGenerator(
+        prompt_name='baseline_plus_3examples',
+        enable_postprocessing=True,
+        use_enhanced_postprocessor=False  # RuleChecklist 사용
+    )
+
+    # 교정 실행
+    print(f"교정 진행 중... (API 호출 {len(test_df)}회, 예상 시간: 5-8분)")
+    print()
+
+    corrections = []
+    for idx, row in test_df.iterrows():
+        err_text = row['err_sentence']
+
+        # API 호출
+        corrected = generator.generate_single(err_text)
+
+        corrections.append({
+            'id': row['id'],
+            'err_sentence': err_text,
+            'cor_sentence': corrected
+        })
+
+        # 진행 상황 출력
+        if len(corrections) % 25 == 0:
+            print(f"  [{len(corrections)}/{len(test_df)}] 완료... ({len(corrections)/len(test_df)*100:.1f}%)")
+
+    print(f"  [{len(corrections)}/{len(test_df)}] 완료! (100.0%)")
+    print()
+
+    # DataFrame 변환
+    submission_df = pd.DataFrame(corrections)
+
+    # 검증 로직
+    print("="*70)
+    print("제출 파일 검증")
+    print("="*70)
+    print()
+
+    # 1. 메타데이터 체크
+    metadata_mask = submission_df['cor_sentence'].apply(detect_metadata)
+    metadata_count = metadata_mask.sum()
+
+    print(f"1. 메타데이터 탐지: {metadata_count}개")
+    if metadata_count > 0:
+        print(f"   ⚠️ 메타데이터 의심 케이스:")
+        for idx in submission_df[metadata_mask].index[:5]:
+            row = submission_df.loc[idx]
+            print(f"   - ID {row['id']}: {row['cor_sentence'][:50]}...")
+    else:
+        print(f"   ✅ 메타데이터 없음")
+    print()
+
+    # 2. 길이 폭발 체크
+    submission_df['length_ratio'] = submission_df.apply(
+        lambda row: len(row['cor_sentence']) / len(row['err_sentence'])
+        if len(row['err_sentence']) > 0 else 1.0,
+        axis=1
+    )
+    length_explosion_mask = submission_df['length_ratio'] > 1.5
+    length_explosion_count = length_explosion_mask.sum()
+
+    print(f"2. 길이 폭발 (>150%): {length_explosion_count}개")
+    if length_explosion_count > 0:
+        print(f"   ⚠️ 길이 폭발 케이스:")
+        for idx in submission_df[length_explosion_mask].index[:5]:
+            row = submission_df.loc[idx]
+            print(f"   - ID {row['id']}: {row['length_ratio']:.1%} ({len(row['err_sentence'])}자 → {len(row['cor_sentence'])}자)")
+    else:
+        print(f"   ✅ 길이 폭발 없음")
+    print()
+
+    # 3. 숫자 분리 체크
+    number_separation_issues = []
+    for idx, row in submission_df.iterrows():
+        is_separated, separated_patterns = check_number_separation(
+            row['err_sentence'],
+            row['cor_sentence']
+        )
+        if is_separated:
+            number_separation_issues.append({
+                'id': row['id'],
+                'patterns': separated_patterns
+            })
+
+    print(f"3. 숫자 분리 체크: {len(number_separation_issues)}개")
+    if number_separation_issues:
+        print(f"   ⚠️ 숫자 분리 의심 케이스:")
+        for issue in number_separation_issues[:5]:
+            print(f"   - ID {issue['id']}: {issue['patterns']}")
+    else:
+        print(f"   ✅ 숫자 분리 없음")
+    print()
+
+    # 4. 형식 체크
+    print(f"4. 형식 체크:")
+    print(f"   - 컬럼: {list(submission_df.columns)}")
+    print(f"   - ID 범위: {submission_df['id'].min()} ~ {submission_df['id'].max()}")
+    print(f"   - 결측치: {submission_df.isnull().sum().sum()}개")
+    print(f"   ✅ 형식 정상 (length_ratio는 제출 시 제거)")
+    print()
+
+    # 통계 요약
+    print("="*70)
+    print("통계 요약")
+    print("="*70)
+    print()
+    print(f"평균 길이 비율: {submission_df['length_ratio'].mean():.1%}")
+    print(f"최대 길이 비율: {submission_df['length_ratio'].max():.1%}")
+    print(f"최소 길이 비율: {submission_df['length_ratio'].min():.1%}")
+    print()
+
+    # 최종 판정
+    print("="*70)
+    print("최종 판정")
+    print("="*70)
+    print()
+
+    issues = []
+    if metadata_count > 5:
+        issues.append(f"메타데이터 과다 ({metadata_count}개)")
+    if length_explosion_count > 15:
+        issues.append(f"길이 폭발 과다 ({length_explosion_count}개)")
+    if len(number_separation_issues) > 5:
+        issues.append(f"숫자 분리 과다 ({len(number_separation_issues)}개)")
+
+    if not issues:
+        print("✅ 제출 파일 검증 통과!")
+        print("   → LB 제출 준비 완료")
+    else:
+        print("⚠️ 검토 필요 항목:")
+        for issue in issues:
+            print(f"   - {issue}")
+        print("   → 수동 검토 권장")
+    print()
+
+    # 파일 저장
+    output_dir = Path(__file__).parent / "outputs" / "submissions" / "test"
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    output_path = output_dir / "submission_baseline_plus_3examples_test.csv"
+
+    # 제출용 파일 (length_ratio 제거)
+    submission_df[['id', 'err_sentence', 'cor_sentence']].to_csv(
+        output_path,
+        index=False,
+        encoding='utf-8'
+    )
+
+    print(f"제출 파일 저장: {output_path}")
+    print()
+
+    # 검증용 상세 파일
+    detail_path = output_dir / "submission_baseline_plus_3examples_test_detail.csv"
+    submission_df.to_csv(detail_path, index=False, encoding='utf-8')
+    print(f"검증용 상세 파일: {detail_path}")
+    print()
+
+    print("="*70)
+    print("완료!")
+    print("="*70)
+    print()
+    print("예상 성적:")
+    print("  Train Recall: 34.69% (기존 32.24% +2.45%p)")
+    print("  기대 Public LB: 35-37% (기존 34.04% +1-3%p)")
+    print()
+    print(f"다음 단계: {output_path} 파일을 LB에 제출하세요.")
+
+    return submission_df, output_path
+
+
+if __name__ == "__main__":
+    submission_df, output_path = generate_baseline_plus_3examples_test()

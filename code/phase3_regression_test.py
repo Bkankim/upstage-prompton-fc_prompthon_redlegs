@@ -35,14 +35,14 @@ def main():
     print()
 
     # 개선된 Option A 테스트
-    print('프롬프트: fewshot_v3 (검증된 원본)')
-    print('후처리: EnhancedPostprocessor (개선판)')
+    print('프롬프트: baseline_plus_3examples')
+    print('후처리: RuleChecklist (안전)')
     print()
 
     generator = SentenceGenerator(
-        prompt_name='fewshot_v3',
+        prompt_name='baseline_plus_3examples',
         enable_postprocessing=True,
-        use_enhanced_postprocessor=True
+        use_enhanced_postprocessor=False
     )
 
     print(f'교정 진행 중... (API 호출 {len(test_df)}회)')

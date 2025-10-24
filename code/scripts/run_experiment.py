@@ -18,7 +18,7 @@ from datetime import datetime
 # src 모듈 import를 위한 경로 추가
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from src.prompts.registry import get_registry, register_default_prompts
+from src.prompts.registry import get_registry, register_default_prompts, list_prompts
 
 
 def run_command(cmd, description):
@@ -70,8 +70,7 @@ Examples:
 
     # 사용 가능한 프롬프트 목록 가져오기
     register_default_prompts()
-    registry = get_registry()
-    available_prompts = registry.list_prompts()
+    available_prompts = list_prompts()
 
     parser.add_argument(
         "--prompt",

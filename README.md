@@ -192,13 +192,13 @@ Output (교정 문장 + 메트릭)
 ```
 ├── code/                   # 핵심 코드
 │   ├── src/                # 소스 모듈
-│   │   ├── prompts/        # 프롬프트 템플릿 (5개)
+│   │   ├── prompts/        # 프롬프트 템플릿 (4개)
 │   │   ├── metrics/        # 평가 지표
 │   │   ├── postprocessors/ # 후처리
 │   │   ├── generator.py
 │   │   └── evaluator.py
 │   ├── scripts/            # 실행 스크립트
-│   ├── tests/              # 단위 테스트 (85개)
+│   ├── tests/              # 단위 테스트
 │   ├── data/               # Train/Test 데이터
 │   └── outputs/            # 실험 결과
 │       ├── submissions/    # 교정 결과 CSV
@@ -208,7 +208,8 @@ Output (교정 문장 + 메트릭)
 │   ├── 01_GETTING_STARTED.md       # 시작 가이드
 │   ├── 02_EXPERIMENT_INSIGHTS.md   # 실험 인사이트 [중요] 필독
 │   ├── 03_TECHNICAL_DETAILS.md     # 기술 구현 상세
-│   └── 04_COMPETITION_GUIDE.md     # 대회 정보
+│   ├── 04_COMPETITION_GUIDE.md     # 대회 정보
+│   └── 05_WORKFLOW.md              # 실험 워크플로우
 ├── outputs/                # 실험 결과 아카이브
 │   ├── analysis/           # 핵심 분석 문서 (3개)
 │   └── logs/               # 실험 로그 요약
@@ -256,10 +257,11 @@ cat outputs/logs/baseline_results.json
 2. **[실험 인사이트](docs/02_EXPERIMENT_INSIGHTS.md)** [중요] 필독
    - Phase 1-6 실험 여정
    - 실패 사례 심층 분석
-   - 핵심 인사이트 5가지
+   - 핵심 인사이트
    - 기술적 한계 및 교훈
 3. **[기술 구현 상세](docs/03_TECHNICAL_DETAILS.md)** - 아키텍처 및 평가 지표
 4. **[대회 정보](docs/04_COMPETITION_GUIDE.md)** - 규칙 및 데이터셋
+5. **[실험 워크플로우](docs/05_WORKFLOW.md)** - Phase 1-6 재현 가이드
 
 ### 상세 분석 문서
 

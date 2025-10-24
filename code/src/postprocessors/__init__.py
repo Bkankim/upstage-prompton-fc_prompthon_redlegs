@@ -3,6 +3,11 @@
 """
 
 from .base import BasePostprocessor
-from .rule_checklist import RuleChecklistPostprocessor
+from .enhanced_postprocessor import EnhancedPostprocessor
+from .minimal_rule import MinimalRulePostprocessor
 
-__all__ = ["BasePostprocessor", "RuleChecklistPostprocessor"]
+__all__ = [
+    "BasePostprocessor",
+    "EnhancedPostprocessor",
+    "MinimalRulePostprocessor"
+]

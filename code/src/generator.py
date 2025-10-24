@@ -11,9 +11,9 @@ from tqdm import tqdm
 from dotenv import load_dotenv
 from openai import OpenAI
 
-from src.prompts.registry import get_registry, register_default_prompts
-from src.postprocessors.rule_checklist import RuleChecklistPostprocessor
+from src.prompts.registry import get_registry, register_default_prompts, list_prompts
 from src.postprocessors.enhanced_postprocessor import EnhancedPostprocessor
+from src.postprocessors.minimal_rule import MinimalRulePostprocessor
 
 
 class SentenceGenerator:
@@ -62,7 +62,7 @@ class SentenceGenerator:
 
         self.prompt = registry.get(prompt_name)
         if self.prompt is None:
-            available = registry.list_prompts()
+            available = list_prompts()
             raise ValueError(
                 f"Prompt '{prompt_name}' not found in registry. "
                 f"Available prompts: {available}"
@@ -84,7 +84,7 @@ class SentenceGenerator:
             if use_enhanced_postprocessor:
                 self.postprocessor = EnhancedPostprocessor(enable_logging=True)
             else:
-                self.postprocessor = RuleChecklistPostprocessor()
+                self.postprocessor = MinimalRulePostprocessor()
         else:
             self.postprocessor = None
 

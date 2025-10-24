@@ -42,3 +42,14 @@ def get_registry() -> Dict[str, Type[BasePrompt]]:
     if not _REGISTRY:
         register_default_prompts()
     return _REGISTRY
+
+
+def list_prompts() -> list:
+    """
+    등록된 프롬프트 이름 목록 반환
+
+    Returns:
+        list: 프롬프트 이름 목록
+    """
+    registry = get_registry()
+    return list(registry.keys())

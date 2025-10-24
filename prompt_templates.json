@@ -1,200 +1,49 @@
 {
-  "competition": "Upstage GEC Promptathon 2025",
-  "team": "Red Legs",
-  "submission_date": "2025-10-24",
-  "best_prompt": "baseline",
-  "best_performance": {
-    "public_lb": 34.0426,
-    "private_lb": 13.4454,
-    "train_recall": 32.24,
-    "train_precision": 14.79
-  },
-
-  "prompts": [
-    {
-      "name": "baseline",
-      "description": "최고 성능 프롬프트 - 맞춤법 예시 1개 사용",
-      "status": "best",
-      "performance": {
-        "public_lb": 34.0426,
-        "private_lb": 13.4454,
-        "train_recall": 32.24,
-        "train_precision": 14.79
-      },
-      "template": {
-        "system_message": "",
-        "user_message_template": "# 지시\n- 다음 규칙에 따라 원문을 교정하세요.\n- 맞춤법, 띄어쓰기, 문장 부호, 문법을 자연스럽게 교정합니다.\n- 어떤 경우에도 설명이나 부가적인 내용은 포함하지 않습니다.\n- 오직 교정된 문장만 출력합니다.\n\n# 예시\n<원문>\n오늘 날씨가 않좋은데, 김치찌게 먹으러 갈려고.\n<교정>\n오늘 날씨가 안 좋은데, 김치찌개 먹으러 가려고.\n\n# 교정할 문장\n<원문>\n{text}\n<교정>",
-        "examples": [
-          {
-            "type": "맞춤법",
-            "input": "오늘 날씨가 않좋은데, 김치찌게 먹으러 갈려고.",
-            "output": "오늘 날씨가 안 좋은데, 김치찌개 먹으러 가려고.",
-            "corrections": [
-              "않좋은 → 안 좋은 (띄어쓰기)",
-              "김치찌게 → 김치찌개 (맞춤법)",
-              "갈려고 → 가려고 (문법)"
-            ]
-          }
+    "template_name": "PromptTemplate_RedLegs_GEC_Baseline",
+    "description": "한국어 문법 교정 최고 성능 프롬프트 (Public LB 34.04%). 맞춤법 예시 1개를 사용하여 맞춤법, 띄어쓰기, 문법 오류를 교정합니다.",
+    "prompt": {
+        "system": "",
+        "user_turns": [
+            {
+                "user": "# 지시\n- 다음 규칙에 따라 원문을 교정하세요.\n- 맞춤법, 띄어쓰기, 문장 부호, 문법을 자연스럽게 교정합니다.\n- 어떤 경우에도 설명이나 부가적인 내용은 포함하지 않습니다.\n- 오직 교정된 문장만 출력합니다.\n\n# 예시\n<원문>\n오늘 날씨가 않좋은데, 김치찌게 먹으러 갈려고.\n<교정>\n오늘 날씨가 안 좋은데, 김치찌개 먹으러 가려고.\n\n# 교정할 문장\n<원문>\n{text}\n<교정>"
+            }
         ]
-      },
-      "parameters": {
-        "model": "solar-pro2",
+    },
+    "multi_turn": false,
+    "function_calling": false,
+    "function_details": {
+        "function_name": "",
+        "description": ""
+    },
+    "parameters": {
         "temperature": 0.0,
-        "max_tokens": 2000,
-        "top_p": 1.0,
-        "frequency_penalty": 0.0,
-        "presence_penalty": 0.0
-      },
-      "insights": [
+        "max_tokens": 2000
+    },
+    "api_call_strategy": {
+        "calls_per_case": 3,
+        "strategy_description": "최대 3회까지 API 호출. 첫 번째 시도에서 성공하면 즉시 반환. 실패 시 재시도."
+    },
+    "performance": {
+        "public_leaderboard": 34.0426,
+        "private_leaderboard": 13.4454,
+        "train_recall": 32.24,
+        "train_precision": 14.79,
+        "submissions_used": "4/20"
+    },
+    "metadata": {
+        "team": "Red Legs",
+        "competition": "Upstage GEC Promptathon 2025",
+        "model": "solar-pro2",
+        "submission_date": "2025-10-24",
+        "experiment_phases": 6,
+        "total_prompts_tested": "20+",
+        "actual_working_days": 2
+    },
+    "insights": [
         "단 1개의 예시로 3가지 오류 유형(맞춤법, 띄어쓰기, 문법) 커버",
-        "간결한 지시사항으로 과적합 방지",
-        "예시 품질 > 예시 개수"
-      ]
-    },
-
-    {
-      "name": "zero_shot",
-      "description": "예시 없음 - 순수한 지시사항만 사용",
-      "status": "tested",
-      "performance": {
-        "public_lb": 31.9149,
-        "private_lb": 12.6109,
-        "train_recall": 32.24,
-        "train_precision": 16.25
-      },
-      "template": {
-        "system_message": "",
-        "user_message_template": "# 지시사항\n다음 한국어 문장을 교정하세요.\n\n# 교정 범위\n- 맞춤법 오류 (예: 않좋은→안 좋은, 김치찌게→김치찌개)\n- 띄어쓰기 오류 (예: 받아봐야겠다→받아 봐야겠다)\n- 조사 오류 (예: 탐탁치→탐탁지, 을→를)\n- 사이시옷 오류 (예: 개나리꽃길→개나리꽃 길)\n- 문장부호 오류 (예: 동아일보→《동아일보》, 12.3→12·3)\n- 비문 및 어색한 표현\n- 단순 오탈자\n- 표현 다듬기 (중복 제거, 자연스러운 표현)\n\n# 출력 규칙 (매우 중요!)\n1. 교정된 문장만 출력하세요\n2. 설명, 주석, 라벨을 절대 포함하지 마세요\n3. \"원문:\", \"교정:\", \"출력:\", \"최종\", \"수정\" 등의 단어를 사용하지 마세요\n4. 콜론(:), 줄바꿈, 특수기호(#, ※, [], <>)를 추가하지 마세요\n5. 원문이 여러 문장이면 모든 문장을 교정하세요 (첫 문장만 출력 금지)\n6. 원문의 내용을 임의로 추가하거나 삭제하지 마세요\n\n# 교정할 문장\n{text}",
-        "examples": []
-      },
-      "parameters": {
-        "model": "solar-pro2",
-        "temperature": 0.0,
-        "max_tokens": 2000
-      },
-      "insights": [
-        "예시 없이도 작동하지만 baseline보다 보수적",
-        "False Negative 증가 (-2.13%p)",
-        "최소 1개 예시 필요함을 확인"
-      ]
-    },
-
-    {
-      "name": "baseline_josa",
-      "description": "조사 오류 예시 1개 - 조사 특화 시도",
-      "status": "tested",
-      "performance": {
-        "public_lb": 31.9149,
-        "private_lb": 11.5385,
-        "train_recall": 33.47,
-        "train_precision": 16.74
-      },
-      "template": {
-        "system_message": "",
-        "user_message_template": "# 지시\n- 다음 규칙에 따라 원문을 교정하세요.\n- 맞춤법, 띄어쓰기, 문장 부호, 문법을 자연스럽게 교정합니다.\n- 어떤 경우에도 설명이나 부가적인 내용은 포함하지 않습니다.\n- 오직 교정된 문장만 출력합니다.\n\n# 예시\n<원문>\n그는 삼성전자의 제안을 탐탁치 않게 여겼다.\n<교정>\n그는 삼성전자의 제안을 탐탁지 않게 여겼다.\n\n# 교정할 문장\n<원문>\n{text}\n<교정>",
-        "examples": [
-          {
-            "type": "조사",
-            "input": "그는 삼성전자의 제안을 탐탁치 않게 여겼다.",
-            "output": "그는 삼성전자의 제안을 탐탁지 않게 여겼다.",
-            "corrections": [
-              "탐탁치 → 탐탁지 (조사 오류)"
-            ]
-          }
-        ]
-      },
-      "parameters": {
-        "model": "solar-pro2",
-        "temperature": 0.0,
-        "max_tokens": 2000
-      },
-      "insights": [
-        "Train 성능 향상(+1.23%p) → Test 성능 하락(-2.13%p)",
-        "특화된 예시는 오히려 일반화 실패",
-        "Train 성능 ≠ Test 성능"
-      ]
-    },
-
-    {
-      "name": "baseline_plus_3examples",
-      "description": "4개 예시 사용 - 다양한 오류 유형 커버 시도",
-      "status": "failed",
-      "performance": {
-        "public_lb": 27.6596,
-        "private_lb": 9.7744,
-        "train_recall": 34.69,
-        "train_precision": 15.43
-      },
-      "template": {
-        "system_message": "",
-        "user_message_template": "# 지시\n- 다음 규칙에 따라 원문을 교정하세요.\n- 맞춤법, 띄어쓰기, 문장 부호, 문법을 자연스럽게 교정합니다.\n- 어떤 경우에도 설명이나 부가적인 내용은 포함하지 않습니다.\n- 오직 교정된 문장만 출력합니다.\n\n# 예시\n\n## 맞춤법\n<원문>\n오늘 날씨가 않좋은데, 김치찌게 먹으러 갈려고.\n<교정>\n오늘 날씨가 안 좋은데, 김치찌개 먹으러 가려고.\n\n## 조사 오류\n<원문>\n그는 삼성전자의 제안을 탐탁치 않게 여겼다.\n<교정>\n그는 삼성전자의 제안을 탐탁지 않게 여겼다.\n\n## 사이시옷\n<원문>\n그녀는 개나리꽃길을 따라 천천히 걸어갔다.\n<교정>\n그녀는 개나리꽃 길을 따라 천천히 걸어갔다.\n\n## 표현 다듬기\n<원문>\n이 제품은 정말 최고의 성능을 발휘하는 아주 좋은 제품입니다.\n<교정>\n이 제품은 최고의 성능을 발휘하는 좋은 제품입니다.\n\n# 교정할 문장\n<원문>\n{text}\n<교정>",
-        "examples": [
-          {
-            "type": "맞춤법",
-            "input": "오늘 날씨가 않좋은데, 김치찌게 먹으러 갈려고.",
-            "output": "오늘 날씨가 안 좋은데, 김치찌개 먹으러 가려고."
-          },
-          {
-            "type": "조사",
-            "input": "그는 삼성전자의 제안을 탐탁치 않게 여겼다.",
-            "output": "그는 삼성전자의 제안을 탐탁지 않게 여겼다."
-          },
-          {
-            "type": "사이시옷",
-            "input": "그녀는 개나리꽃길을 따라 천천히 걸어갔다.",
-            "output": "그녀는 개나리꽃 길을 따라 천천히 걸어갔다."
-          },
-          {
-            "type": "표현다듬기",
-            "input": "이 제품은 정말 최고의 성능을 발휘하는 아주 좋은 제품입니다.",
-            "output": "이 제품은 최고의 성능을 발휘하는 좋은 제품입니다."
-          }
-        ]
-      },
-      "parameters": {
-        "model": "solar-pro2",
-        "temperature": 0.0,
-        "max_tokens": 2000
-      },
-      "insights": [
-        "파국적 실패: -18.7% 성능 하락",
-        "모든 예시가 짧은 단일 문장 → 길이 편향 학습",
-        "긴 문장의 첫 문장만 출력하고 멈춤 (70-80% 텍스트 삭제)",
-        "More ≠ Better - 예시 개수보다 품질이 중요"
-      ]
-    }
-  ],
-
-  "experiment_summary": {
-    "total_phases": 6,
-    "total_prompts_tested": "20+",
-    "submissions_used": "4/20",
-    "actual_working_days": 2,
-    "key_findings": [
-      "Few-shot 예시 1개가 최적점",
-      "예시 품질 > 예시 개수",
-      "Train 성능 향상 = Test 성능 하락 (역설)",
-      "명확한 규칙은 이미 완벽 처리",
-      "첫 시도(Baseline)가 최선"
-    ]
-  },
-
-  "usage_example": {
-    "python": "from openai import OpenAI\n\nclient = OpenAI(\n    api_key='YOUR_API_KEY',\n    base_url='https://api.upstage.ai/v1'\n)\n\ntext = '오늘 날씨가 않좋은데, 김치찌게 먹으러 갈려고.'\nprompt = prompt_templates['prompts'][0]['template']['user_message_template']\n\nresponse = client.chat.completions.create(\n    model='solar-pro2',\n    messages=[{'role': 'user', 'content': prompt.format(text=text)}],\n    temperature=0.0,\n    max_tokens=2000\n)\n\nprint(response.choices[0].message.content)",
-    "curl": "curl https://api.upstage.ai/v1/chat/completions \\\n  -H 'Content-Type: application/json' \\\n  -H 'Authorization: Bearer YOUR_API_KEY' \\\n  -d '{\n    \"model\": \"solar-pro2\",\n    \"messages\": [{\"role\": \"user\", \"content\": \"# 지시\\n- 다음 규칙에 따라 원문을 교정하세요...{text}\"}],\n    \"temperature\": 0.0,\n    \"max_tokens\": 2000\n  }'"
-  },
-
-  "metadata": {
-    "python_version": "3.12",
-    "package_manager": "uv",
-    "evaluation_metric": "LCS-based Recall/Precision",
-    "train_dataset_size": 254,
-    "test_dataset_size": 110,
-    "model": "Upstage Solar Pro 2",
-    "constraints": [
-      "No model fine-tuning",
-      "Prompt engineering only",
-      "2000 token limit per session"
-    ]
-  }
+        "예시 품질 > 예시 개수 (4개 예시는 -18.7% 하락)",
+        "Train 성능 향상이 Test 성능 향상을 보장하지 않음",
+        "첫 시도(Baseline)가 20+ 변형 중 최고 성능"
+    ],
+    "usage_example": "text = '오늘 날씨가 않좋은데, 김치찌게 먹으러 갈려고.'\nprompt = prompt_template['prompt']['user_turns'][0]['user'].format(text=text)\n\nresponse = client.chat.completions.create(\n    model='solar-pro2',\n    messages=[{'role': 'user', 'content': prompt}],\n    temperature=0.0,\n    max_tokens=2000\n)\n\nprint(response.choices[0].message.content)\n# 출력: 오늘 날씨가 안 좋은데, 김치찌개 먹으러 가려고."
 }
